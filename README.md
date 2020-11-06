@@ -14,5 +14,4 @@ Project work for lecture Programming I
   
   # Nice to have
   
-  * Saving of application state / game progress
-  * 
+* Saving of application state / game progress 
