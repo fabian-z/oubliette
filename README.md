@@ -3,7 +3,7 @@ Project work for lecture Programming I
 
 # Must have
 
-* Must be developed with JavaScript, no HTML/CSS oder Browser
+* Must be developed with JavaScript, no HTML/CSS or Browser
 * Node.js as interpreter
 * The application must run stable and be able to cope with exceptionary situations (invalid input, missing files, ..)
 * Reasonable and intuitive user experience
