@@ -32,10 +32,10 @@ Project work for lecture Programming I
 # Nice to have
   
 * Saving of application state / game player progress 
-  * Save random seed or entire level?
+  * Save random seed or entire level map?
 * Configurable key mapping
 * Research of UX with different algorithm parameters (map generation, distribution rules)
 * Event logs
 * Different weapons?
-* Easter egg / Achievements?
+* Easter egg / achievements?
 * Sound effects?
