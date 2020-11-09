@@ -1,4 +1,7 @@
 # oubliette
+*ˌuːblɪˈɛt* - 
+*a dungeon with an opening only at the top*
+
 Project work for lecture Programming I
 
 # Must have
@@ -11,8 +14,28 @@ Project work for lecture Programming I
 * Large frameworks (gaming, web frameworks, ..) must not be used
 * Simple libraries (e.g. readline-sync, lodash, node-localstorage) are allowed, more complex libraries are to be approved by [@behrends](https://github.com/behrends)
   * TUI libraries, such as some ncurses binding or [blessed](https://github.com/chjj/blessed) have been approved for this specific project
-  * TypeScript is allowed  
+  * TypeScript is allowed
+
+
+* Rouge-like game with monospace ASCII / UTF-8 art interface
+  * Procedurally generated maps / dungeons
+    * TODO: Research algorithms and test JS implementations
+  * Random distribution of monsters and items
+  * Track player status (health points, experience, character name)
+* Controlled with keyboard
+  * Arrow keys, WASD?
+* Difficulty selection
+  * Hard, Medium, Easy - with different game balancing
+* Split-screen with player and game status
+* Help screen / signs and symbols explanation for improved UX
 
 # Nice to have
   
-* Saving of application state / game progress 
+* Saving of application state / game player progress 
+  * Save random seed or entire level?
+* Configurable key mapping
+* Research of UX with different algorithm parameters (map generation, distribution rules)
+* Event logs
+* Different weapons?
+* Easter egg / Achievements?
+* Sound effects?
