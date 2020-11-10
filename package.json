@@ -1,0 +1,24 @@
+{
+  "name": "oubliette",
+  "version": "0.0.1",
+  "description": "Rouge-like terminal ASCII game",
+  "main": "main.js",
+  "dependencies": {
+    "blessed": "^0.1.81",
+    "blessed-contrib": "^4.8.20"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fabian-z/oubliette.git"
+  },
+  "author": "Jennifer L. Krueger & Fabian Zaremba",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fabian-z/oubliette/issues"
+  },
+  "homepage": "https://github.com/fabian-z/oubliette#readme"
+}
