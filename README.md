@@ -14,6 +14,7 @@ Project work for lecture Programming I
 * Large frameworks (gaming, web frameworks, ..) must not be used
 * Simple libraries (e.g. readline-sync, lodash, node-localstorage) are allowed, more complex libraries are to be approved by [@behrends](https://github.com/behrends)
   * TUI libraries, such as some ncurses binding or [blessed](https://github.com/chjj/blessed) have been approved for this specific project
+  * Dungeon generation libraries, such as [dungeon-generator](https://github.com/domasx2/dungeon-generator) or [Dungeonizer.js](https://github.com/mlknz/Dungeonizer.js) have benn approved for this specific project
   * TypeScript is allowed
 
 
