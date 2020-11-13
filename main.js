@@ -1,20 +1,20 @@
-let blessed = require('blessed');
-let contrib = require('blessed-contrib');
+'use strict';
+import blessed from 'blessed';
 
 // Create a screen object.
 let screen = blessed.screen({
   smartCSR: true
 });
 
-screen.title = 'my window title';
+screen.title = 'oubliette';
 
-// Create a box perfectly centered horizontally and vertically.
-let box = blessed.box({
+// Create main game viewport
+let mainView = blessed.box({
   top: 'center',
   left: 'left',
   width: '80%',
   height: '100%',
-  content: 'Hello {bold}world{/bold}!',
+  content: 'Viewport TBD',
   tags: true,
   border: {
     type: 'line'
@@ -32,15 +32,15 @@ let box = blessed.box({
 });
 
 // Append our box to the screen.
-screen.append(box);
+screen.append(mainView);
 
 // Create a box perfectly centered horizontally and vertically.
-let box2 = blessed.box({
+let rightView = blessed.box({
   top: 'center',
   right: '0',
   width: '20%',
   height: '100%',
-  content: 'Hello {bold}world 2{/bold}!',
+  content: 'Sidebar',
   tags: true,
   border: {
     type: 'line'
@@ -58,27 +58,46 @@ let box2 = blessed.box({
 });
 
 // Append our box to the screen.
-screen.append(box2);
+screen.append(rightView);
 
-let gauge = contrib.gauge({label: 'Progress', stroke: 'green', fill: 'white'})
-box.append(gauge);
-gauge.setPercent(0);
-
+let gauge = blessed.progressbar({
+  parent: screen,
+  border: 'line',
+  style: {
+    fg: 'blue',
+    bg: 'default',
+    bar: {
+      bg: 'default',
+      fg: 'blue'
+    },
+    border: {
+      fg: 'default',
+      bg: 'default'
+    }
+  },
+  ch: '■',
+  width: '50%',
+  height: 3,
+  top: 3,
+  left: 3,
+  filled: 0
+});
+//let gauge = contrib.gauge({label: 'Progress', stroke: 'green', fill: 'white'});
+mainView.append(gauge);
+gauge.setProgress(0);
 
 // If our box is clicked, change the content.
-box.on('click', function(data) {
-  box.setContent('{center}Some different {red-fg}content{/red-fg}.{/center}');
-  
-
-gauge.setPercent(Math.random() * 100);
+mainView.on('click', function(data) {
+  mainView.setContent('{center}Some different {red-fg}content{/red-fg}.{/center}');
+  gauge.setProgress(Math.random() * 100);
   screen.render();
 });
 
 // If box is focused, handle `enter`/`return` and give us some more content.
-box.key('enter', function(ch, key) {
-  box.setContent('{right}Even different {black-fg}content{/black-fg}.{/right}\n');
-  box.setLine(1, 'bar');
-  box.insertLine(1, 'foo');
+rightView.key('enter', function(ch, key) {
+  rightView.setContent('{right}Even different {black-fg}content{/black-fg}.{/right}\n');
+  rightView.setLine(1, 'bar');
+  rightView.insertLine(1, 'foo');
   screen.render();
 });
 
@@ -88,8 +107,13 @@ screen.key(['escape', 'q', 'C-c'], function(ch, key) {
 });
 
 // Focus our element.
-box.focus();
+mainView.focus();
 
+var timer = setInterval(function() {
+  gauge.setProgress(Math.random() * 100);
+  screen.render();
+}, 10);
 
 // Render the screen.
 screen.render();
+
