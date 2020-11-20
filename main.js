@@ -1,9 +1,11 @@
 'use strict';
 import blessed from 'blessed';
+import {generateDungeon} from './dungeon.js';
 
 // Create a screen object.
 let screen = blessed.screen({
-  smartCSR: true
+  smartCSR: true,
+  warnings: true
 });
 
 screen.title = 'oubliette';
@@ -21,12 +23,12 @@ let mainView = blessed.box({
   },
   style: {
     fg: 'white',
-    bg: 'magenta',
+    //bg: 'magenta',
     border: {
       fg: '#f0f0f0'
     },
     hover: {
-      bg: 'green'
+      //bg: 'green'
     }
   }
 });
@@ -47,12 +49,12 @@ let rightView = blessed.box({
   },
   style: {
     fg: 'white',
-    bg: 'magenta',
+    //bg: 'magenta',
     border: {
       fg: '#f0f0f0'
     },
     hover: {
-      bg: 'green'
+      //bg: 'green'
     }
   }
 });
@@ -60,15 +62,23 @@ let rightView = blessed.box({
 // Append our box to the screen.
 screen.append(rightView);
 
+//let gauge = contrib.gauge({label: 'Progress', stroke: 'green', fill: 'white'});
+let gaugeLabel = blessed.box({
+  parent: screen,
+  width: '50%',
+  height: 3,
+  content: "Player: Anonymous\nHP"
+
+});
 let gauge = blessed.progressbar({
   parent: screen,
   border: 'line',
   style: {
-    fg: 'blue',
+    fg: 'white',
     bg: 'default',
     bar: {
       bg: 'default',
-      fg: 'blue'
+      fg: 'red'
     },
     border: {
       fg: 'default',
@@ -76,18 +86,19 @@ let gauge = blessed.progressbar({
     }
   },
   ch: '■',
-  width: '50%',
+  width: '80%',
   height: 3,
-  top: 3,
-  left: 3,
+  top: 6,
+  //left: 3,
   filled: 0
 });
-//let gauge = contrib.gauge({label: 'Progress', stroke: 'green', fill: 'white'});
-mainView.append(gauge);
-gauge.setProgress(0);
+
+rightView.append(gaugeLabel);
+rightView.append(gauge);
+gauge.setProgress(50);
 
 // If our box is clicked, change the content.
-mainView.on('click', function(data) {
+/*mainView.on('click', function(data) {
   mainView.setContent('{center}Some different {red-fg}content{/red-fg}.{/center}');
   gauge.setProgress(Math.random() * 100);
   screen.render();
@@ -99,7 +110,7 @@ rightView.key('enter', function(ch, key) {
   rightView.setLine(1, 'bar');
   rightView.insertLine(1, 'foo');
   screen.render();
-});
+});*/
 
 // Quit on Escape, q, or Control-C.
 screen.key(['escape', 'q', 'C-c'], function(ch, key) {
@@ -109,10 +120,50 @@ screen.key(['escape', 'q', 'C-c'], function(ch, key) {
 // Focus our element.
 mainView.focus();
 
-var timer = setInterval(function() {
+/*var timer = setInterval(function() {
   gauge.setProgress(Math.random() * 100);
   screen.render();
-}, 10);
+}, 10);*/
+
+
+let dungeon = generateDungeon();
+dungeon.print();
+
+let out = [];
+for (let y = 0; y < dungeon.size[1]; y ++) {
+  let row = [];
+  for (let x = 0; x < dungeon.size[0]; x++) {
+      if (dungeon.start_pos && dungeon.start_pos[0] === x && dungeon.start_pos[1] === y) {
+          row.push('{red-fg}{green-bg}{bold}s{/bold}{/green-bg}{/red-fg}');
+      } else {
+          row.push(dungeon.walls.get([x, y]) ? 'x' : ' ');
+      }
+  }
+  out.push(row);
+}
+
+console.log(out);
+
+let viewTable = blessed.table({
+  parent: screen,
+  rows: out,
+  height: '90%',
+  width: '90%',
+  tags: true,
+  scrollable: true,
+  alwaysScroll: true,
+  keys: true,
+  interactive: true,
+  scrollbar: true,
+  //border: {
+  //  type: 'line'
+  //},
+});
+
+mainView.append(viewTable);
+
+//mainView.setContent(JSON.stringify(out));
+
 
 // Render the screen.
 screen.render();
