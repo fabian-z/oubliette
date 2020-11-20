@@ -5,7 +5,10 @@ import {generateDungeon} from './dungeon.js';
 // Create a screen object.
 let screen = blessed.screen({
   smartCSR: true,
-  warnings: true
+  warnings: true,
+  //autoPadding: true,
+  debug: true,
+  enableKeys: true,
 });
 
 screen.title = 'oubliette';
@@ -129,40 +132,88 @@ mainView.focus();
 let dungeon = generateDungeon();
 dungeon.print();
 
+const renderScaling = 3;
+
 let out = [];
 for (let y = 0; y < dungeon.size[1]; y ++) {
   let row = [];
   for (let x = 0; x < dungeon.size[0]; x++) {
       if (dungeon.start_pos && dungeon.start_pos[0] === x && dungeon.start_pos[1] === y) {
-          row.push('{red-fg}{green-bg}{bold}s{/bold}{/green-bg}{/red-fg}');
+        //for(let i = 0; i <= renderScaling; i++) {
+          //row.push('{red-fg}{green-bg}{bold}s{/bold}{/green-bg}{/red-fg}');
+        //}
       } else {
-          row.push(dungeon.walls.get([x, y]) ? 'x' : ' ');
+        for(let i = 0; i <= renderScaling; i++) {
+          row.push(dungeon.walls.get([x, y]) ? '■' : ' ');
+        }
+        
       }
   }
-  out.push(row);
+  for(let i = 0; i <= renderScaling; i++) {
+    out.push(row);
+  }
 }
 
-console.log(out);
+console.log(screen.width, screen.height);
 
+const refresh = function (map) {
+  //console.log(mainView, map[0][0]);
+  
+
+  let out2 = "";
+  let x, y = 0;
+  for (y = 0; y < mainView.height - 2; y++) {
+    for (x = 0; x < mainView.width - 2; x++) {
+      if (map.length > y && map[y].length > x) {
+        out2 += map[y][x];
+      } else {
+        out2 += "*";
+      }
+     //out2 = out2 + map[y][x];
+
+    }
+    out2 += "\n";
+  }
+  return out2
+};
+
+let curTime = new Date();
+let screenOut = refresh(out);
+//console.log(screen.width, screen.height);
+mainView.setContent(screenOut);
+screen.render();
+let nowTime = new Date();
+
+console.log("wut", nowTime - curTime);
+
+console.log(mainView.height, mainView.width);
+
+
+/*
 let viewTable = blessed.table({
   parent: screen,
   rows: out,
-  height: '90%',
-  width: '90%',
+  height: '100%',
+  width: '100%',
   tags: true,
   scrollable: true,
   alwaysScroll: true,
   keys: true,
   interactive: true,
   scrollbar: true,
-  //border: {
-  //  type: 'line'
-  //},
+  border: {
+    type: 'line'
+  }
 });
 
-mainView.append(viewTable);
+mainView.append(viewTable);*/
 
-//mainView.setContent(JSON.stringify(out));
+screen.on("resize", function() {
+screenOut = refresh(out);
+console.log(screen.width, screen.height);
+mainView.setContent(screenOut);
+screen.render();
+})
 
 
 // Render the screen.

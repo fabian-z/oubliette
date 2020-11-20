@@ -3,18 +3,18 @@ import Dungeon from '2d-dungeon';
 
 export function generateDungeon() {
     let dungeon = new Dungeon({
-        size: [100, 100], 
+        size: [256, 256], 
         //seed: 'abcd', //omit for generated seed
         rooms: {
             initial: {
-                min_size: [3, 3],
-                max_size: [3, 3],
+                min_size: [8, 8],
+                max_size: [10, 10],
                 max_exits: 1,
                 position: [0, 0] //OPTIONAL pos of initial room 
             },
             any: {
-                min_size: [2, 2],
-                max_size: [5, 5],
+                min_size: [8, 8],
+                max_size: [10, 10],
                 max_exits: 4
             }
         },
@@ -24,7 +24,7 @@ export function generateDungeon() {
         symmetric_rooms: false, // exits must be in the center of a wall if true
         interconnects: 1, //extra corridors to connect rooms and make circular paths. not 100% guaranteed
         max_interconnect_length: 10,
-        room_count: 10
+        room_count: 20
     });
     
     dungeon.generate();
