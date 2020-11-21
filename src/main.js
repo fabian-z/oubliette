@@ -25,7 +25,7 @@ let mainView = blessed.box({
     type: 'line'
   },
   style: {
-    fg: 'white',
+    fg: 'grey',
     //bg: 'magenta',
     border: {
       fg: '#f0f0f0'
@@ -195,7 +195,7 @@ const refresh = function (map) {
 
         if (playerPositionXY[0] === x && playerPositionXY[1] == y) {
           // Render player at current position
-          buf += "{bold}@{/bold}";
+          buf += "{green-fg}{bold}@{/bold}{/green-fg}";
           continue;
         }
 
