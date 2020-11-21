@@ -25,7 +25,7 @@ let mainView = blessed.box({
     type: 'line'
   },
   style: {
-    fg: 'grey',
+    fg: 'white',
     //bg: 'magenta',
     border: {
       fg: '#f0f0f0'
@@ -132,26 +132,24 @@ mainView.focus();
 let dungeon = generateDungeon();
 //dungeon.print();
 
-const renderScaling = 3;
-
+const renderScaling = 4;
 let baseMap = [];
 for (let y = 0; y < dungeon.size[1]; y++) {
   let row = [];
   for (let x = 0; x < dungeon.size[0]; x++) {
-    for (let i = 0; i <= renderScaling; i++) {
+    for (let i = 0; i < renderScaling; i++) {
       row.push(dungeon.walls.get([x, y]) ? '■' : ' ');
     }
   }
 
-  for (let i = 0; i <= renderScaling; i++) {
+  for (let i = 0; i < renderScaling; i++) {
     baseMap.push(row);
   }
-
 }
 
 console.log(screen.width, screen.height);
 
-let playerPositionXY = [Math.floor(dungeon.start_pos[0] * 4), Math.floor(dungeon.start_pos[1] * 4)];
+let playerPositionXY = [Math.floor(dungeon.start_pos[0] * renderScaling), Math.floor(dungeon.start_pos[1] * renderScaling)];
 // Quit on Escape, q, or Control-C.
 screen.key(['w', 'a', 's', 'd'], function (ch, key) {
   let origPos = [... playerPositionXY];
@@ -169,6 +167,12 @@ screen.key(['w', 'a', 's', 'd'], function (ch, key) {
       playerPositionXY[0] = playerPositionXY[0] + 1;
       break;
   }
+  // TODO switch to 
+ /*    // See any keypress.
+    screen.on('keypress', function(ch, key){
+      console.log(JSON.stringify(key));
+    });
+*/
 
   // TODO model game state and check against baseMap as well as dynamic objects
   if (baseMap[playerPositionXY[1]][playerPositionXY[0]] != " ") {
