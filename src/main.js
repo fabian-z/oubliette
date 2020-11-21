@@ -130,7 +130,7 @@ mainView.focus();
 
 
 let dungeon = generateDungeon();
-dungeon.print();
+//dungeon.print();
 
 const renderScaling = 3;
 
@@ -154,6 +154,7 @@ console.log(screen.width, screen.height);
 let playerPositionXY = [Math.floor(dungeon.start_pos[0] * 4), Math.floor(dungeon.start_pos[1] * 4)];
 // Quit on Escape, q, or Control-C.
 screen.key(['w', 'a', 's', 'd'], function (ch, key) {
+  let origPos = [... playerPositionXY];
   switch (key.full) {
     case "w":
       playerPositionXY[1] = playerPositionXY[1] - 1;
@@ -167,6 +168,12 @@ screen.key(['w', 'a', 's', 'd'], function (ch, key) {
     case "d":
       playerPositionXY[0] = playerPositionXY[0] + 1;
       break;
+  }
+
+  // TODO model game state and check against baseMap as well as dynamic objects
+  if (baseMap[playerPositionXY[1]][playerPositionXY[0]] != " ") {
+    playerPositionXY = origPos;
+    return;
   }
 
   let screenOut = refresh(baseMap);
@@ -188,7 +195,7 @@ const refresh = function (map) {
 
         if (playerPositionXY[0] === x && playerPositionXY[1] == y) {
           // Render player at current position
-          buf += "@";
+          buf += "{bold}@{/bold}";
           continue;
         }
 
