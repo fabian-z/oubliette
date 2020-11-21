@@ -8,7 +8,9 @@
     "2d-dungeon": "0.0.7",
     "blessed": "^0.1.81"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^7.14.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0"
   },
