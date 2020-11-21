@@ -134,7 +134,7 @@ dungeon.print();
 
 const renderScaling = 3;
 
-let out = [];
+let baseMap = [];
 for (let y = 0; y < dungeon.size[1]; y ++) {
   let row = [];
   for (let x = 0; x < dungeon.size[0]; x++) {
@@ -142,49 +142,84 @@ for (let y = 0; y < dungeon.size[1]; y ++) {
         //for(let i = 0; i <= renderScaling; i++) {
           //row.push('{red-fg}{green-bg}{bold}s{/bold}{/green-bg}{/red-fg}');
         //}
-      } else {
-        for(let i = 0; i <= renderScaling; i++) {
-          row.push(dungeon.walls.get([x, y]) ? '■' : ' ');
-        }
-        
+        //console.log("placing player");
+        //placePlayer = true;
+      }
+      for(let i = 0; i <= renderScaling; i++) {
+        row.push(dungeon.walls.get([x, y]) ? '■' : ' ');
       }
   }
+
   for(let i = 0; i <= renderScaling; i++) {
-    out.push(row);
+    baseMap.push(row);
   }
+
 }
 
 console.log(screen.width, screen.height);
 
-const refresh = function (map) {
-  //console.log(mainView, map[0][0]);
-  
-
-  let out2 = "";
-  let x, y = 0;
-  for (y = 0; y < mainView.height - 2; y++) {
-    for (x = 0; x < mainView.width - 2; x++) {
-      if (map.length > y && map[y].length > x) {
-        out2 += map[y][x];
-      } else {
-        out2 += "*";
-      }
-     //out2 = out2 + map[y][x];
-
-    }
-    out2 += "\n";
+let playerPositionXY = [Math.floor(dungeon.start_pos[0]*4), Math.floor(dungeon.start_pos[1]*4)];
+// Quit on Escape, q, or Control-C.
+screen.key(['w', 'a', 's', 'd'], function(ch, key) {;
+  switch (key.full) {
+    case "w":
+  playerPositionXY[1] = playerPositionXY[1]-1;
+      break;
+      case "a":
+        playerPositionXY[0] = playerPositionXY[0]-1;
+        break;
+        case "s":
+  playerPositionXY[1] = playerPositionXY[1]+1;
+          break;
+          case "d":
+            playerPositionXY[0] = playerPositionXY[0]+1;
+            break;
   }
-  return out2
+  //playerPositionXY[0] = playerPositionXY[0]+1;
+  //playerPositionXY[1] = playerPositionXY[1]+1;
+  let screenOut = refresh(baseMap);
+//console.log(screen.width, screen.height);
+mainView.setContent(screenOut);
+screen.render();
+});
+
+
+
+const refresh = function (map) {
+  let buf = "";
+  let x, y = 0;
+  //console.log(map.length / dungeon.size[1]);
+  let camera = getCameraPos(playerPositionXY[0], playerPositionXY[1], mainView.width -2, mainView.height - 2, map.length, map[0].length);
+  for (y = camera[1]; y < mainView.height - 2 + camera[1]; y++) {
+    for (x = camera[0]; x < mainView.width - 2 + camera[0]; x++) {
+      if (map.length > y && map[y].length > x) {
+
+        if (playerPositionXY[0] === x && playerPositionXY[1] == y) {
+          // Render player at start position
+          buf += "@";
+          continue;
+        }
+
+        buf += map[y][x];
+      } else {
+        // Rendering screen larger than map
+        buf += "*";
+      }
+     
+    }
+    buf += "\n";
+  }
+  return buf
 };
 
 let curTime = new Date();
-let screenOut = refresh(out);
+let screenOut = refresh(baseMap);
 //console.log(screen.width, screen.height);
 mainView.setContent(screenOut);
 screen.render();
 let nowTime = new Date();
 
-console.log("wut", nowTime - curTime);
+console.log("timed", nowTime - curTime);
 
 console.log(mainView.height, mainView.width);
 
@@ -209,7 +244,7 @@ let viewTable = blessed.table({
 mainView.append(viewTable);*/
 
 screen.on("resize", function() {
-screenOut = refresh(out);
+screenOut = refresh(baseMap);
 console.log(screen.width, screen.height);
 mainView.setContent(screenOut);
 screen.render();
@@ -218,4 +253,38 @@ screen.render();
 
 // Render the screen.
 screen.render();
+
+/*
+getCameraPos implements a scrolling map camera position centered on the player.
+Algorithm from http://www.roguebasin.com/index.php?title=Scrolling_map
+    Let s be the dimensions of the screen, p be the player coordinates, and c be the coordinates of the upper left of the camera: 
+    If p < s / 2, then c := 0. 
+    If p >= m - (s / 2), then c := m - s. 
+    Otherwise, c := p - (s / 2). 
+*/
+function getCameraPos(playerX, playerY, screenX, screenY, mapX, mapY) {
+  let cameraXY = [0, 0];
+  let halfScreenX = Math.floor(screenX / 2);
+  let halfScreenY = Math.floor(screenY / 2);
+  if (playerX < halfScreenX) {
+    // TODO remove as performance optimization?
+    cameraXY[0] = 0;
+  } else if (playerX >= mapX - halfScreenX) {
+    cameraXY[0] = mapX - screenX;
+  } else {
+    cameraXY[0] = playerX - halfScreenX;
+  }
+
+  if (playerY < halfScreenY) {
+    // TODO remove as performance optimization?
+    cameraXY[1] = 0;
+  } else if (playerY >= mapY - halfScreenY) {
+    cameraXY[1] = mapY - screenY;
+  } else {
+    cameraXY[1] = playerY - halfScreenY;
+  }
+
+  return cameraXY
+}
+
 

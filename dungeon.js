@@ -10,7 +10,7 @@ export function generateDungeon() {
                 min_size: [8, 8],
                 max_size: [10, 10],
                 max_exits: 1,
-                position: [0, 0] //OPTIONAL pos of initial room 
+                //position: [0, 0] //OPTIONAL pos of initial room 
             },
             any: {
                 min_size: [8, 8],
