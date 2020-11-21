@@ -188,7 +188,7 @@ const refresh = function (map) {
   let buf = "";
   let x, y = 0;
   //console.log(map.length / dungeon.size[1]);
-  let camera = getCameraPos(playerPositionXY[0], playerPositionXY[1], mainView.width - 2, mainView.height - 2, map.length, map[0].length);
+  let camera = getCameraPos(playerPositionXY[0], playerPositionXY[1], mainView.width - 2, mainView.height - 2, map[0].length, map.length);
   for (y = camera[1]; y < mainView.height - 2 + camera[1]; y++) {
     for (x = camera[0]; x < mainView.width - 2 + camera[0]; x++) {
       if (map.length > y && map[y].length > x) {
