@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Rouge-like terminal ASCII game",
   "type": "module",
-  "main": "main.js",
+  "main": "src/main.js",
   "dependencies": {
     "2d-dungeon": "0.0.7",
     "blessed": "^0.1.81"
