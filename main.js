@@ -116,7 +116,7 @@ rightView.key('enter', function(ch, key) {
 });*/
 
 // Quit on Escape, q, or Control-C.
-screen.key(['escape', 'q', 'C-c'], function () {
+screen.key(['escape', 'q', 'C-c'], function (ch, key) {
   return process.exit(0);
 });
 
