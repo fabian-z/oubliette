@@ -1,104 +1,6 @@
-import blessed from 'blessed';
-import { generateDungeon } from './dungeon.js';
+import { TerminalInterface } from './tui.js';
+import { GenerateDungeon } from './dungeon.js';
 
-// Create a screen object.
-let screen = blessed.screen({
-  smartCSR: true,
-  warnings: true,
-  //autoPadding: true,
-  debug: true,
-  enableKeys: true,
-  title: 'oubliette'
-});
-
-//screen.title = 'oubliette';
-
-// Create main game viewport
-let mainView = blessed.box({
-  top: 'center',
-  left: 'left',
-  width: '80%',
-  height: '100%',
-  content: 'Viewport TBD',
-  tags: true,
-  border: {
-    type: 'line'
-  },
-  style: {
-    fg: 'white',
-    //bg: 'magenta',
-    border: {
-      fg: '#f0f0f0'
-    },
-    hover: {
-      //bg: 'green'
-    }
-  }
-});
-
-// Append our box to the screen.
-screen.append(mainView);
-
-// Create a box perfectly centered horizontally and vertically.
-let rightView = blessed.box({
-  top: 'center',
-  right: '0',
-  width: '20%',
-  height: '100%',
-  content: 'Sidebar',
-  tags: true,
-  border: {
-    type: 'line'
-  },
-  style: {
-    fg: 'white',
-    //bg: 'magenta',
-    border: {
-      fg: '#f0f0f0'
-    },
-    hover: {
-      //bg: 'green'
-    }
-  }
-});
-
-// Append our box to the screen.
-screen.append(rightView);
-
-//let gauge = contrib.gauge({label: 'Progress', stroke: 'green', fill: 'white'});
-let gaugeLabel = blessed.box({
-  parent: screen,
-  width: '50%',
-  height: 3,
-  content: "Player: Anonymous\nHP"
-
-});
-let gauge = blessed.progressbar({
-  parent: screen,
-  border: 'line',
-  style: {
-    fg: 'white',
-    bg: 'default',
-    bar: {
-      bg: 'default',
-      fg: 'red'
-    },
-    border: {
-      fg: 'default',
-      bg: 'default'
-    }
-  },
-  ch: '■',
-  width: '80%',
-  height: 3,
-  top: 6,
-  //left: 3,
-  filled: 0
-});
-
-rightView.append(gaugeLabel);
-rightView.append(gauge);
-gauge.setProgress(50);
 
 // If our box is clicked, change the content.
 /*mainView.on('click', function(data) {
@@ -113,23 +15,16 @@ rightView.key('enter', function(ch, key) {
   rightView.setLine(1, 'bar');
   rightView.insertLine(1, 'foo');
   screen.render();
-});*/
-
-// Quit on Escape, q, or Control-C.
-screen.key(['escape', 'q', 'C-c'], function () {
-  return process.exit(0);
 });
 
-// Focus our element.
-mainView.focus();
-
-/*var timer = setInterval(function() {
+var timer = setInterval(function() {
   gauge.setProgress(Math.random() * 100);
   screen.render();
 }, 10);*/
 
+let tui = new (TerminalInterface);
 
-let dungeon = generateDungeon();
+let dungeon = GenerateDungeon();
 //dungeon.print();
 
 const renderScaling = 4;
@@ -147,32 +42,30 @@ for (let y = 0; y < dungeon.size[1]; y++) {
   }
 }
 
-console.log(screen.width, screen.height);
+//console.log(screen.width, screen.height);
 
 let playerPositionXY = [Math.floor(dungeon.start_pos[0] * renderScaling), Math.floor(dungeon.start_pos[1] * renderScaling)];
 // Quit on Escape, q, or Control-C.
-screen.key(['w', 'a', 's', 'd'], function (ch, key) {
-  let origPos = [... playerPositionXY];
-  switch (key.full) {
+tui.onKeypress(function (ch, key) {
+  let origPos = [...playerPositionXY];
+  switch (key.name) {
     case "w":
+    case "up":
       playerPositionXY[1] = playerPositionXY[1] - 1;
       break;
     case "a":
+    case "left":
       playerPositionXY[0] = playerPositionXY[0] - 1;
       break;
     case "s":
+    case "down":
       playerPositionXY[1] = playerPositionXY[1] + 1;
       break;
     case "d":
+    case "right":
       playerPositionXY[0] = playerPositionXY[0] + 1;
       break;
   }
-  // TODO switch to 
- /*    // See any keypress.
-    screen.on('keypress', function(ch, key){
-      console.log(JSON.stringify(key));
-    });
-*/
 
   // TODO model game state and check against baseMap as well as dynamic objects
   if (baseMap[playerPositionXY[1]][playerPositionXY[0]] != " ") {
@@ -180,63 +73,34 @@ screen.key(['w', 'a', 's', 'd'], function (ch, key) {
     return;
   }
 
-  let screenOut = refresh(baseMap);
+
+
+  let screenOut = refresh(playerPositionXY, tui.getMainViewSizeXY(), baseMap);
   //console.log(screen.width, screen.height);
-  mainView.setContent(screenOut);
-  screen.render();
+  tui.setMainContent(screenOut);
 });
 
 
 
-const refresh = function (map) {
-  let buf = "";
-  let x, y = 0;
-  //console.log(map.length / dungeon.size[1]);
-  let camera = getCameraPos(playerPositionXY[0], playerPositionXY[1], mainView.width - 2, mainView.height - 2, map[0].length, map.length);
-  for (y = camera[1]; y < mainView.height - 2 + camera[1]; y++) {
-    for (x = camera[0]; x < mainView.width - 2 + camera[0]; x++) {
-      if (map.length > y && map[y].length > x) {
-
-        if (playerPositionXY[0] === x && playerPositionXY[1] == y) {
-          // Render player at current position
-          buf += "{green-fg}{bold}@{/bold}{/green-fg}";
-          continue;
-        }
-
-        buf += map[y][x];
-      } else {
-        // Rendering screen larger than map
-        buf += "*";
-      }
-
-    }
-    buf += "\n";
-  }
-  return buf
-};
 
 let curTime = new Date();
-let screenOut = refresh(baseMap);
+let screenOut = refresh(playerPositionXY, tui.getMainViewSizeXY(), baseMap);
 //console.log(screen.width, screen.height);
-mainView.setContent(screenOut);
-screen.render();
+tui.setMainContent(screenOut);
+
 let nowTime = new Date();
 
 console.log("timed", nowTime - curTime);
 
-console.log(mainView.height, mainView.width);
+//console.log(mainView.height, mainView.width);
 
 
-screen.on("resize", function () {
-  screenOut = refresh(baseMap);
-  console.log(screen.width, screen.height);
-  mainView.setContent(screenOut);
-  screen.render();
+tui.onScreenResize("resize", function () {
+  let screenOut = refresh(playerPositionXY, tui.getMainViewSizeXY(), baseMap);
+  //console.log(screen.width, screen.height);
+  tui.setMainContent(screenOut);
 })
 
-
-// Render the screen.
-screen.render();
 
 /*
 getCameraPos implements a scrolling map camera position centered on the player.
@@ -272,3 +136,30 @@ function getCameraPos(playerX, playerY, screenX, screenY, mapX, mapY) {
 }
 
 
+function refresh(playerPositionXY, viewSize, map) {
+  let buf = "";
+  let x, y = 0;
+  //console.log(map.length / dungeon.size[1]);
+
+  let camera = getCameraPos(playerPositionXY[0], playerPositionXY[1], viewSize[0] - 2, viewSize[1] - 2, map[0].length, map.length);
+  for (y = camera[1]; y < viewSize[1] - 2 + camera[1]; y++) {
+    for (x = camera[0]; x < viewSize[0] - 2 + camera[0]; x++) {
+      if (map.length > y && map[y].length > x) {
+
+        if (playerPositionXY[0] === x && playerPositionXY[1] == y) {
+          // Render player at current position
+          buf += "{green-fg}{bold}@{/bold}{/green-fg}";
+          continue;
+        }
+
+        buf += map[y][x];
+      } else {
+        // Rendering screen larger than map
+        buf += "*";
+      }
+
+    }
+    buf += "\n";
+  }
+  return buf
+};

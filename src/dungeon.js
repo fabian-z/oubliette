@@ -1,8 +1,8 @@
 import Dungeon from '2d-dungeon';
 
-export function generateDungeon() {
+export function GenerateDungeon() {
     let dungeon = new Dungeon({
-        size: [256, 256], 
+        size: [256, 256],
         //seed: 'abcd', //omit for generated seed
         rooms: {
             initial: {
@@ -25,7 +25,7 @@ export function generateDungeon() {
         max_interconnect_length: 10,
         room_count: 20
     });
-    
+
     dungeon.generate();
     return dungeon;
 }
@@ -57,7 +57,7 @@ for(let piece of dungeon.children) {
 }
 
 console.log(dungeon.initial_room); //piece tagged as 'initial'
-console.log(dungeon.start_pos); //[x, y] center of 'initial' piece 
+console.log(dungeon.start_pos); //[x, y] center of 'initial' piece
 */
 
 //exports = {'generateDungeon': generateDungeon}
