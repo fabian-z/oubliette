@@ -138,7 +138,7 @@ function getCameraPos(player, screen, mapX, mapY) {
 
 
 function refresh(playerPositionXY, viewSizeXY, map) {
-  let buf = "";
+  let buf = [];
   let x, y = 0;
   //console.log(map.length / dungeon.size[1]);
 
@@ -151,18 +151,18 @@ function refresh(playerPositionXY, viewSizeXY, map) {
 
         if (playerPositionXY.x === x && playerPositionXY.y == y) {
           // Render player at current position
-          buf += "{green-fg}{bold}@{/bold}{/green-fg}";
+          buf.push("{green-fg}{bold}@{/bold}{/green-fg}");
           continue;
         }
 
-        buf += map[y][x];
+        buf.push(map[y][x]);
       } else {
         // Rendering screen larger than map
-        buf += "*";
+        buf.push("*");
       }
 
     }
-    buf += "\n";
+    buf.push("\n");
   }
-  return buf
-};
+  return buf;
+}
