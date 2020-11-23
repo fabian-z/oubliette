@@ -6,13 +6,12 @@
   "main": "src/main.js",
   "dependencies": {
     "2d-dungeon": "0.0.7",
-    "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@babel/preset-env": "^7.12.7",
     "blessed": "^0.1.81"
   },
   "devDependencies": {
     "@babel/core": "^7.12.7",
     "@babel/eslint-parser": "^7.12.1",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
     "eslint": "^7.14.0"
   },
   "babel": {
