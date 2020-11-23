@@ -164,5 +164,5 @@ function refresh(playerPositionXY, viewSizeXY, map) {
     }
     buf.push("\n");
   }
-  return buf;
+  return buf.join("");
 }
