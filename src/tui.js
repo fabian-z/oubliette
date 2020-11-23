@@ -2,9 +2,9 @@ import blessed from 'blessed';
 
 export class TerminalInterface {
 
-    screen
-    mainView
-    rightView
+    screen;
+    mainView;
+    rightView;
 
     setMainContent(content) {
         this.mainView.setContent(content);

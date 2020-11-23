@@ -1,6 +1,6 @@
 import { TerminalInterface } from './tui.js';
 import { GenerateDungeon } from './dungeon.js';
-
+import { Vector2 } from './util.js'
 
 // If our box is clicked, change the content.
 /*mainView.on('click', function(data) {
@@ -44,31 +44,31 @@ for (let y = 0; y < dungeon.size[1]; y++) {
 
 //console.log(screen.width, screen.height);
 
-let playerPositionXY = [Math.floor(dungeon.start_pos[0] * renderScaling), Math.floor(dungeon.start_pos[1] * renderScaling)];
+let playerPositionXY = new Vector2(Math.floor(dungeon.start_pos[0] * renderScaling), Math.floor(dungeon.start_pos[1] * renderScaling));
 // Quit on Escape, q, or Control-C.
 tui.onKeypress(function (ch, key) {
-  let origPos = [...playerPositionXY];
+  let origPos = playerPositionXY.clone();
   switch (key.name) {
     case "w":
     case "up":
-      playerPositionXY[1] = playerPositionXY[1] - 1;
+      playerPositionXY.y = playerPositionXY.y - 1;
       break;
     case "a":
     case "left":
-      playerPositionXY[0] = playerPositionXY[0] - 1;
+      playerPositionXY.x = playerPositionXY.x - 1;
       break;
     case "s":
     case "down":
-      playerPositionXY[1] = playerPositionXY[1] + 1;
+      playerPositionXY.y = playerPositionXY.y + 1;
       break;
     case "d":
     case "right":
-      playerPositionXY[0] = playerPositionXY[0] + 1;
+      playerPositionXY.x = playerPositionXY.x + 1;
       break;
   }
 
   // TODO model game state and check against baseMap as well as dynamic objects
-  if (baseMap[playerPositionXY[1]][playerPositionXY[0]] != " ") {
+  if (baseMap[playerPositionXY.y][playerPositionXY.x] != " ") {
     playerPositionXY = origPos;
     return;
   }
@@ -110,43 +110,46 @@ Algorithm from http://www.roguebasin.com/index.php?title=Scrolling_map
     If p >= m - (s / 2), then c := m - s. 
     Otherwise, c := p - (s / 2). 
 */
-function getCameraPos(playerX, playerY, screenX, screenY, mapX, mapY) {
-  let cameraXY = [0, 0];
-  let halfScreenX = Math.floor(screenX / 2);
-  let halfScreenY = Math.floor(screenY / 2);
-  if (playerX < halfScreenX) {
+function getCameraPos(player, screen, mapX, mapY) {
+  let camera = new Vector2(0, 0);
+  let halfScreen = screen.scalar(0.5).floor();
+
+
+  if (player.x < halfScreen.x) {
     // TODO remove as performance optimization?
-    cameraXY[0] = 0;
-  } else if (playerX >= mapX - halfScreenX) {
-    cameraXY[0] = mapX - screenX;
+    camera.x = 0;
+  } else if (player.x >= mapX - halfScreen.x) {
+    camera.x = mapX - screen.x;
   } else {
-    cameraXY[0] = playerX - halfScreenX;
+    camera.x = player.x - halfScreen.x;
   }
 
-  if (playerY < halfScreenY) {
+  if (player.y < halfScreen.y) {
     // TODO remove as performance optimization?
-    cameraXY[1] = 0;
-  } else if (playerY >= mapY - halfScreenY) {
-    cameraXY[1] = mapY - screenY;
+    camera.y = 0;
+  } else if (player.y >= mapY - halfScreen.y) {
+    camera.y = mapY - screen.y;
   } else {
-    cameraXY[1] = playerY - halfScreenY;
+    camera.y = player.y - halfScreen.y;
   }
 
-  return cameraXY
+  return camera
 }
 
 
-function refresh(playerPositionXY, viewSize, map) {
+function refresh(playerPositionXY, viewSizeXY, map) {
   let buf = "";
   let x, y = 0;
   //console.log(map.length / dungeon.size[1]);
 
-  let camera = getCameraPos(playerPositionXY[0], playerPositionXY[1], viewSize[0] - 2, viewSize[1] - 2, map[0].length, map.length);
-  for (y = camera[1]; y < viewSize[1] - 2 + camera[1]; y++) {
-    for (x = camera[0]; x < viewSize[0] - 2 + camera[0]; x++) {
+  let viewSize = new Vector2(viewSizeXY[0], viewSizeXY[1]).sub(new Vector2(2, 2));
+
+  let camera = getCameraPos(playerPositionXY, viewSize, map[0].length, map.length);
+  for (y = camera.y; y < viewSize.y + camera.y; y++) {
+    for (x = camera.x; x < viewSize.x + camera.x; x++) {
       if (map.length > y && map[y].length > x) {
 
-        if (playerPositionXY[0] === x && playerPositionXY[1] == y) {
+        if (playerPositionXY.x === x && playerPositionXY.y == y) {
           // Render player at current position
           buf += "{green-fg}{bold}@{/bold}{/green-fg}";
           continue;
