@@ -1,18 +1,20 @@
 import blessed from 'blessed';
+import { Vector2 } from './util.js'
 
 export class TerminalInterface {
 
     screen;
     mainView;
     rightView;
+    preRender = {};
 
     setMainContent(content) {
         this.mainView.setContent(content);
         this.screen.render();
     }
 
-    getMainViewSizeXY() {
-        return [this.mainView.width, this.mainView.height];
+    getMainViewSize() {
+        return new Vector2(this.mainView.width, this.mainView.height);
     }
 
     onScreenResize(callback) {
@@ -43,7 +45,7 @@ export class TerminalInterface {
             width: '80%',
             height: '100%',
             content: 'Viewport TBD',
-            tags: true,
+            tags: false,
             border: {
                 type: 'line'
             },
@@ -130,7 +132,31 @@ export class TerminalInterface {
             return process.exit(0);
         });
 
+        this.preRender.player = blessed.parseTags("{green-fg}{bold}@{/bold}{/green-fg}");
+
         // Focus our element.
         this.mainView.focus();
     }
 }
+
+// Handler examples
+
+// If our box is clicked, change the content.
+/*mainView.on('click', function(data) {
+  mainView.setContent('{center}Some different {red-fg}content{/red-fg}.{/center}');
+  gauge.setProgress(Math.random() * 100);
+  screen.render();
+});
+
+// If box is focused, handle `enter`/`return` and give us some more content.
+rightView.key('enter', function(ch, key) {
+  rightView.setContent('{right}Even different {black-fg}content{/black-fg}.{/right}\n');
+  rightView.setLine(1, 'bar');
+  rightView.insertLine(1, 'foo');
+  screen.render();
+});
+
+var timer = setInterval(function() {
+  gauge.setProgress(Math.random() * 100);
+  screen.render();
+}, 10);*/

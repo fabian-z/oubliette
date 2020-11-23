@@ -2,30 +2,9 @@ import { TerminalInterface } from './tui.js';
 import { GenerateDungeon } from './dungeon.js';
 import { Vector2 } from './util.js'
 
-// If our box is clicked, change the content.
-/*mainView.on('click', function(data) {
-  mainView.setContent('{center}Some different {red-fg}content{/red-fg}.{/center}');
-  gauge.setProgress(Math.random() * 100);
-  screen.render();
-});
-
-// If box is focused, handle `enter`/`return` and give us some more content.
-rightView.key('enter', function(ch, key) {
-  rightView.setContent('{right}Even different {black-fg}content{/black-fg}.{/right}\n');
-  rightView.setLine(1, 'bar');
-  rightView.insertLine(1, 'foo');
-  screen.render();
-});
-
-var timer = setInterval(function() {
-  gauge.setProgress(Math.random() * 100);
-  screen.render();
-}, 10);*/
-
-let tui = new (TerminalInterface);
+let tui = new TerminalInterface();
 
 let dungeon = GenerateDungeon();
-//dungeon.print();
 
 const renderScaling = 4;
 let baseMap = [];
@@ -44,62 +23,56 @@ for (let y = 0; y < dungeon.size[1]; y++) {
 
 //console.log(screen.width, screen.height);
 
-let playerPositionXY = new Vector2(Math.floor(dungeon.start_pos[0] * renderScaling), Math.floor(dungeon.start_pos[1] * renderScaling));
-// Quit on Escape, q, or Control-C.
+
+let playerPosition = new Vector2(dungeon.start_pos[0], dungeon.start_pos[1]).scalar(renderScaling).floor();
+
+// initial screen drawing
+let curTime = new Date();
+let screenOut = refresh(playerPosition, tui.getMainViewSize(), baseMap);
+
+tui.setMainContent(screenOut);
+let nowTime = new Date();
+console.log("timed", nowTime - curTime);
+
+
+// refresh render on screen resize
+tui.onScreenResize("resize", function () {
+  let screenOut = refresh(playerPosition, tui.getMainViewSize(), baseMap);
+  tui.setMainContent(screenOut);
+})
+
+// react to user input with WASD / arrow keys, move player only for now
 tui.onKeypress(function (ch, key) {
-  let origPos = playerPositionXY.clone();
+  let origPos = playerPosition.clone();
   switch (key.name) {
     case "w":
     case "up":
-      playerPositionXY.y = playerPositionXY.y - 1;
+      playerPosition.y = playerPosition.y - 1;
       break;
     case "a":
     case "left":
-      playerPositionXY.x = playerPositionXY.x - 1;
+      playerPosition.x = playerPosition.x - 1;
       break;
     case "s":
     case "down":
-      playerPositionXY.y = playerPositionXY.y + 1;
+      playerPosition.y = playerPosition.y + 1;
       break;
     case "d":
     case "right":
-      playerPositionXY.x = playerPositionXY.x + 1;
+      playerPosition.x = playerPosition.x + 1;
       break;
   }
 
   // TODO model game state and check against baseMap as well as dynamic objects
-  if (baseMap[playerPositionXY.y][playerPositionXY.x] != " ") {
-    playerPositionXY = origPos;
+  if (baseMap[playerPosition.y][playerPosition.x] != " ") {
+    playerPosition = origPos;
     return;
   }
 
-
-
-  let screenOut = refresh(playerPositionXY, tui.getMainViewSizeXY(), baseMap);
+  let screenOut = refresh(playerPosition, tui.getMainViewSize(), baseMap);
   //console.log(screen.width, screen.height);
   tui.setMainContent(screenOut);
 });
-
-
-
-
-let curTime = new Date();
-let screenOut = refresh(playerPositionXY, tui.getMainViewSizeXY(), baseMap);
-//console.log(screen.width, screen.height);
-tui.setMainContent(screenOut);
-
-let nowTime = new Date();
-
-console.log("timed", nowTime - curTime);
-
-//console.log(mainView.height, mainView.width);
-
-
-tui.onScreenResize("resize", function () {
-  let screenOut = refresh(playerPositionXY, tui.getMainViewSizeXY(), baseMap);
-  //console.log(screen.width, screen.height);
-  tui.setMainContent(screenOut);
-})
 
 
 /*
@@ -137,21 +110,21 @@ function getCameraPos(player, screen, mapX, mapY) {
 }
 
 
-function refresh(playerPositionXY, viewSizeXY, map) {
+function refresh(playerPosition, viewSize, map) {
   let buf = [];
   let x, y = 0;
   //console.log(map.length / dungeon.size[1]);
 
-  let viewSize = new Vector2(viewSizeXY[0], viewSizeXY[1]).sub(new Vector2(2, 2));
+  let viewSizeAvail = viewSize.sub(new Vector2(2, 2));
 
-  let camera = getCameraPos(playerPositionXY, viewSize, map[0].length, map.length);
-  for (y = camera.y; y < viewSize.y + camera.y; y++) {
-    for (x = camera.x; x < viewSize.x + camera.x; x++) {
+  let camera = getCameraPos(playerPosition, viewSizeAvail, map[0].length, map.length);
+  for (y = camera.y; y < viewSizeAvail.y + camera.y; y++) {
+    for (x = camera.x; x < viewSizeAvail.x + camera.x; x++) {
       if (map.length > y && map[y].length > x) {
 
-        if (playerPositionXY.x === x && playerPositionXY.y == y) {
+        if (playerPosition.x === x && playerPosition.y == y) {
           // Render player at current position
-          buf.push("{green-fg}{bold}@{/bold}{/green-fg}");
+          buf.push(tui.preRender.player);
           continue;
         }
 
