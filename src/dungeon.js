@@ -1,4 +1,3 @@
-'use strict';
 import Dungeon from '2d-dungeon';
 
 export function generateDungeon() {

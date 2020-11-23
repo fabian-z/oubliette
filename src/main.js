@@ -1,4 +1,3 @@
-'use strict';
 import blessed from 'blessed';
 import { generateDungeon } from './dungeon.js';
 
@@ -9,9 +8,10 @@ let screen = blessed.screen({
   //autoPadding: true,
   debug: true,
   enableKeys: true,
+  title: 'oubliette'
 });
 
-screen.title = 'oubliette';
+//screen.title = 'oubliette';
 
 // Create main game viewport
 let mainView = blessed.box({
