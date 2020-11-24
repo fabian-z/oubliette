@@ -21,9 +21,6 @@ for (let y = 0; y < dungeon.size[1]; y++) {
   }
 }
 
-//console.log(screen.width, screen.height);
-
-
 let playerPosition = new Vector2(dungeon.start_pos[0], dungeon.start_pos[1]).scalar(renderScaling).floor();
 
 // initial screen drawing
@@ -70,7 +67,6 @@ tui.onKeypress(function (ch, key) {
   }
 
   let screenOut = refresh(playerPosition, tui.getMainViewSize(), baseMap);
-  //console.log(screen.width, screen.height);
   tui.setMainContent(screenOut);
 });
 
@@ -113,7 +109,6 @@ function getCameraPos(player, screen, mapX, mapY) {
 function refresh(playerPosition, viewSize, map) {
   let buf = [];
   let x, y = 0;
-  //console.log(map.length / dungeon.size[1]);
 
   let viewSizeAvail = viewSize.sub(new Vector2(2, 2));
 
