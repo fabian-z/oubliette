@@ -33,7 +33,7 @@ console.log("timed", nowTime - curTime);
 
 
 // refresh render on screen resize
-tui.onScreenResize("resize", function () {
+tui.onScreenResize(function () {
   let screenOut = refresh(playerPosition, tui.getMainViewSize(), baseMap);
   tui.setMainContent(screenOut);
 })
