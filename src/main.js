@@ -122,7 +122,7 @@ function refresh(playerPosition, viewSize, map) {
     for (x = camera.x; x < viewSizeAvail.x + camera.x; x++) {
       if (map.length > y && map[y].length > x) {
 
-        if (playerPosition.x === x && playerPosition.y == y) {
+        if (playerPosition.x === x && playerPosition.y === y) {
           // Render player at current position
           buf.push(tui.preRender.player);
           continue;
