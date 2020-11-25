@@ -52,7 +52,7 @@ for (let y = 0; y < dungeon.size.y; y++) {
       }
 
 
-     // tile.explored = true;
+      // tile.explored = true;
       if (dungeon.isWall([x, y])) {
         tile.isWall = true;
         tile.impassable = true;
@@ -72,9 +72,16 @@ for (let y = 0; y < dungeon.size.y; y++) {
 
 let playerPosition = dungeon.playerStart.scalar(renderScaling).floor();
 
-// initial screen drawing
-let screenOut = refresh(playerPosition, tui.getMainViewSize(), baseMap);
-tui.setMainContent(screenOut);
+
+
+// welcome message
+let msg = "You awaken in a dark dungeon and can only see a faint light from an opening at the top - try to survive.";
+
+tui.popupMessage(msg, function () {
+  // initial screen drawing
+  let screenOut = refresh(playerPosition, tui.getMainViewSize(), baseMap);
+  tui.setMainContent(screenOut);
+});
 
 // refresh render on screen resize
 tui.onScreenResize(function () {
@@ -122,11 +129,11 @@ tui.onKeypress(function (ch, key) {
 
 
   for (let y = startY; y < endY; y++) {
-    if (baseMap.length < y+1) {
+    if (baseMap.length < y + 1) {
       break;
     }
     for (let x = startX; x < endX; x++) {
-      if (baseMap[y].length < x+1) {
+      if (baseMap[y].length < x + 1) {
         break;
       }
       baseMap[y][x].explored = true;

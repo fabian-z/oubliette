@@ -31,6 +31,30 @@ export class TerminalInterface {
         }
     }
 
+    popupMessage(msg, callback) {
+        let messageBox = blessed.message({
+            parent: this.screen,
+            width: "50%",
+            height: "25%",
+            left: "center",
+            top: "center",
+            border: {
+                type: 'line'
+            },
+            style: {
+                fg: 'white',
+                border: {
+                    fg: '#f0f0f0'
+                },
+            },
+            align: "center",
+            valign: "middle",
+
+        });
+        this.mainView.append(messageBox);
+        messageBox.display(msg, 0, callback == undefined ? callback : function(){});
+    }
+
     constructor() {
 
         // Create a screen object.
@@ -50,19 +74,17 @@ export class TerminalInterface {
             left: 'left',
             width: '80%',
             height: '100%',
-            content: 'Viewport TBD',
+            content: '',
             tags: false,
             border: {
                 type: 'line'
             },
             style: {
                 fg: 'white',
-                //bg: 'magenta',
                 border: {
                     fg: '#f0f0f0'
                 },
                 hover: {
-                    //bg: 'green'
                 }
             }
         });
