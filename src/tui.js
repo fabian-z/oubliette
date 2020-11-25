@@ -123,10 +123,10 @@ export class TerminalInterface {
         let gaugeLabel = blessed.box({
             parent: this.screen,
             width: '50%',
-            height: 3,
-            content: "Player: Anonymous\nHP"
-
+            height: "10%",
+            content: " Player: Anonymous\n\n\n\n HP"
         });
+        
         let gauge = blessed.progressbar({
             parent: this.screen,
             border: 'line',
@@ -142,7 +142,7 @@ export class TerminalInterface {
                     bg: 'default'
                 }
             },
-            ch: '■',
+            ch: '█',
             width: '80%',
             height: 3,
             top: 6,
