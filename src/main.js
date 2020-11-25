@@ -35,6 +35,10 @@ class Tile {
 
 
 const renderScaling = 4;
+const baseExploreRadius = 5;
+const scaledExploreRadius = renderScaling * baseExploreRadius;
+const playerSpeed = 2;
+
 let baseMap = [];
 for (let y = 0; y < dungeon.size[1]; y++) {
   let row = [];
@@ -42,7 +46,13 @@ for (let y = 0; y < dungeon.size[1]; y++) {
     for (let i = 0; i < renderScaling; i++) {
 
       let tile = new Tile();
-      tile.explored = true;
+
+      if (Math.abs(x - dungeon.start_pos[0]) <= baseExploreRadius && Math.abs(y - dungeon.start_pos[1]) <= baseExploreRadius ) {
+        tile.explored = true;
+      }
+
+
+     // tile.explored = true;
       if (dungeon.walls.get([x, y])) {
         tile.isWall = true;
         tile.impassable = true;
@@ -63,13 +73,8 @@ for (let y = 0; y < dungeon.size[1]; y++) {
 let playerPosition = new Vector2(dungeon.start_pos[0], dungeon.start_pos[1]).scalar(renderScaling).floor();
 
 // initial screen drawing
-let curTime = new Date();
 let screenOut = refresh(playerPosition, tui.getMainViewSize(), baseMap);
-
 tui.setMainContent(screenOut);
-let nowTime = new Date();
-console.log("timed", nowTime - curTime);
-
 
 // refresh render on screen resize
 tui.onScreenResize(function () {
@@ -83,19 +88,19 @@ tui.onKeypress(function (ch, key) {
   switch (key.name) {
     case "w":
     case "up":
-      playerPosition.y = playerPosition.y - 1;
+      playerPosition.y -= playerSpeed;
       break;
     case "a":
     case "left":
-      playerPosition.x = playerPosition.x - 1;
+      playerPosition.x -= playerSpeed;
       break;
     case "s":
     case "down":
-      playerPosition.y = playerPosition.y + 1;
+      playerPosition.y += playerSpeed;
       break;
     case "d":
     case "right":
-      playerPosition.x = playerPosition.x + 1;
+      playerPosition.x += playerSpeed;
       break;
   }
 
@@ -105,8 +110,30 @@ tui.onKeypress(function (ch, key) {
     return;
   }
 
+  let startY = Math.abs(playerPosition.y - scaledExploreRadius);
+  let endY = Math.abs(playerPosition.y + scaledExploreRadius);
+  let startX = Math.abs(playerPosition.x - scaledExploreRadius);
+  let endX = Math.abs(playerPosition.x + scaledExploreRadius);
+
+  for (let y = startY; y < endY; y++) {
+    if (baseMap.length < y+1) {
+      break;
+    }
+    for (let x = startX; x < endX; x++) {
+      if (baseMap[y].length < x+1) {
+        break;
+      }
+      baseMap[y][x].explored = true;
+    }
+  }
+
+  let time1 = new Date();
   let screenOut = refresh(playerPosition, tui.getMainViewSize(), baseMap);
   tui.setMainContent(screenOut);
+  let time2 = new Date();
+  tui.debug(time2 - time1);
+
+
 });
 
 

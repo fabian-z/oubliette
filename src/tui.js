@@ -25,6 +25,12 @@ export class TerminalInterface {
         this.screen.on("keypress", callback);
     }
 
+    debug(...msg) {
+        if (this.screen.debug) {
+            this.screen.debug(...msg);
+        }
+    }
+
     constructor() {
 
         // Create a screen object.
