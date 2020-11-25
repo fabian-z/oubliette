@@ -133,6 +133,8 @@ export class TerminalInterface {
         });
 
         this.preRender.player = blessed.parseTags("{green-fg}{bold}@{/bold}{/green-fg}");
+        this.preRender.wall = blessed.parseTags("█");
+        this.preRender.corridor = blessed.parseTags(" ");
 
         // Focus our element.
         this.mainView.focus();

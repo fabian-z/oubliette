@@ -3,8 +3,36 @@ import { GenerateDungeon } from './dungeon.js';
 import { Vector2 } from './util.js'
 
 let tui = new TerminalInterface();
-
 let dungeon = GenerateDungeon();
+
+class Tile {
+  isWall;
+  isCorridor;
+
+  impassable;
+  explored;
+  hasPlayer;
+
+  items = [];
+  monsters = [];
+
+  renderString() {
+    if (this.hasPlayer) {
+      return tui.preRender.player;
+    }
+    if (!this.explored) {
+      return " ";
+    }
+    if (this.isWall) {
+      return tui.preRender.wall;
+    }
+    if (this.isCorridor) {
+      return tui.preRender.corridor;
+    }
+  }
+
+}
+
 
 const renderScaling = 4;
 let baseMap = [];
@@ -12,7 +40,18 @@ for (let y = 0; y < dungeon.size[1]; y++) {
   let row = [];
   for (let x = 0; x < dungeon.size[0]; x++) {
     for (let i = 0; i < renderScaling; i++) {
-      row.push(dungeon.walls.get([x, y]) ? '■' : ' ');
+
+      let tile = new Tile();
+      tile.explored = true;
+      if (dungeon.walls.get([x, y])) {
+        tile.isWall = true;
+        tile.impassable = true;
+      } else {
+        tile.isCorridor = true;
+      }
+      row.push(tile);
+
+      //row.push(dungeon.walls.get([x, y]) ? tui.preRender.wall : tui.preRender.corridor);
     }
   }
 
@@ -61,7 +100,7 @@ tui.onKeypress(function (ch, key) {
   }
 
   // TODO model game state and check against baseMap as well as dynamic objects
-  if (baseMap[playerPosition.y][playerPosition.x] != " ") {
+  if (baseMap[playerPosition.y][playerPosition.x].impassable) {
     playerPosition = origPos;
     return;
   }
@@ -102,7 +141,7 @@ function getCameraPos(player, screen, mapX, mapY) {
     camera.y = player.y - halfScreen.y;
   }
 
-  return camera
+  return camera;
 }
 
 
@@ -123,7 +162,7 @@ function refresh(playerPosition, viewSize, map) {
           continue;
         }
 
-        buf.push(map[y][x]);
+        buf.push(map[y][x].renderString());
       } else {
         // Rendering screen larger than map
         buf.push("*");
@@ -134,3 +173,6 @@ function refresh(playerPosition, viewSize, map) {
   }
   return buf.join("");
 }
+
+
+
