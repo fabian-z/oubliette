@@ -1,9 +1,9 @@
 import { TerminalInterface } from './tui.js';
-import { GenerateDungeon } from './dungeon.js';
+import { Dungeon } from './dungeon.js';
 import { Vector2 } from './util.js'
 
 let tui = new TerminalInterface();
-let dungeon = GenerateDungeon();
+let dungeon = new Dungeon();
 
 class Tile {
   isWall;
@@ -40,20 +40,20 @@ const scaledExploreRadius = renderScaling * baseExploreRadius;
 const playerSpeed = 2;
 
 let baseMap = [];
-for (let y = 0; y < dungeon.size[1]; y++) {
+for (let y = 0; y < dungeon.size.y; y++) {
   let row = [];
-  for (let x = 0; x < dungeon.size[0]; x++) {
+  for (let x = 0; x < dungeon.size.x; x++) {
     for (let i = 0; i < renderScaling; i++) {
 
       let tile = new Tile();
 
-      if (Math.abs(x - dungeon.start_pos[0]) <= baseExploreRadius && Math.abs(y - dungeon.start_pos[1]) <= baseExploreRadius ) {
+      if (x - dungeon.playerStart.x <= baseExploreRadius && y - dungeon.playerStart.y <= baseExploreRadius) {
         tile.explored = true;
       }
 
 
      // tile.explored = true;
-      if (dungeon.walls.get([x, y])) {
+      if (dungeon.isWall([x, y])) {
         tile.isWall = true;
         tile.impassable = true;
       } else {
@@ -70,7 +70,7 @@ for (let y = 0; y < dungeon.size[1]; y++) {
   }
 }
 
-let playerPosition = new Vector2(dungeon.start_pos[0], dungeon.start_pos[1]).scalar(renderScaling).floor();
+let playerPosition = dungeon.playerStart.scalar(renderScaling).floor();
 
 // initial screen drawing
 let screenOut = refresh(playerPosition, tui.getMainViewSize(), baseMap);
@@ -110,10 +110,16 @@ tui.onKeypress(function (ch, key) {
     return;
   }
 
-  let startY = Math.abs(playerPosition.y - scaledExploreRadius);
-  let endY = Math.abs(playerPosition.y + scaledExploreRadius);
-  let startX = Math.abs(playerPosition.x - scaledExploreRadius);
-  let endX = Math.abs(playerPosition.x + scaledExploreRadius);
+  let startY = playerPosition.y - scaledExploreRadius;
+  startY = startY < 0 ? 0 : startY;
+  let endY = playerPosition.y + scaledExploreRadius;
+
+  let startX = playerPosition.x - scaledExploreRadius;
+  startX = startX < 0 ? 0 : startX;
+  let endX = playerPosition.x + scaledExploreRadius;
+
+
+
 
   for (let y = startY; y < endY; y++) {
     if (baseMap.length < y+1) {
@@ -200,6 +206,3 @@ function refresh(playerPosition, viewSize, map) {
   }
   return buf.join("");
 }
-
-
-
