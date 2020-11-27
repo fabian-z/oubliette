@@ -30,20 +30,6 @@ class Tile {
   }
 }
 
-// TODO Autonomous movement
-class Monster {
-  name;
-  symbol;
-  damage;
-  xp;
-  loot = [];
-}
-
-class Item {
-  name;
-  symbol;
-}
-
 class Player {
   pos;
   health = 100;
@@ -271,4 +257,4 @@ class Game {
 }
 
 // Entry point
-let game = new Game();
+new Game();
