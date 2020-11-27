@@ -169,6 +169,7 @@ export class TerminalInterface {
     }
 }
 
+
 // Handler examples
 
 // If our box is clicked, change the content.

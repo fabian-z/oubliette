@@ -2,8 +2,6 @@ import { TerminalInterface } from './tui.js';
 import { Dungeon } from './dungeon.js';
 import { Vector2 } from './util.js'
 
-let tui = new TerminalInterface();
-let dungeon = new Dungeon();
 
 class Tile {
   isWall;
@@ -16,7 +14,7 @@ class Tile {
   items = [];
   monsters = [];
 
-  renderString() {
+  renderString(tui) {
     if (this.hasPlayer) {
       return tui.preRender.player;
     }
@@ -30,186 +28,247 @@ class Tile {
       return tui.preRender.corridor;
     }
   }
+}
+
+// TODO Autonomous movement
+class Monster {
+  name;
+  symbol;
+  damage;
+  xp;
+  loot = [];
+}
+
+class Item {
+  name;
+  symbol;
+}
+
+class Player {
+  pos;
+  health = 100;
+  experience = 0;
+  level = 1;
+  name = "";
+
+
+  constructor(name, pos) {
+    this.name = name;
+    this.pos = pos;
+  }
+
+  move(x, y) {
+    this.pos.x = x;
+    this.pos.y = y;
+  }
+
 
 }
 
+class Game {
+  tiles = []; // [y][x] 2d array
+  monsters = [];
+  items;
+  player;
+  tui;
 
-const renderScaling = 4;
-const baseExploreRadius = 5;
-const scaledExploreRadius = renderScaling * baseExploreRadius;
-const playerSpeed = 2;
+  // should be class internal as implementation detail, TODO: getter functions
+  dungeon;
 
-let baseMap = [];
-for (let y = 0; y < dungeon.size.y; y++) {
-  let row = [];
-  for (let x = 0; x < dungeon.size.x; x++) {
-    for (let i = 0; i < renderScaling; i++) {
+  parameters = {
+    renderScaling: 4,
+    baseExploreRadius: 3,
+    initalExploreFactor: 2,
+    playerSpeed: 1
+  }
 
-      let tile = new Tile();
+  /*
+  getCameraPos implements a scrolling map camera position centered on the player.
+  Algorithm from http://www.roguebasin.com/index.php?title=Scrolling_map
+      Let s be the dimensions of the screen, p be the player coordinates, and c be the coordinates of the upper left of the camera: 
+      If p < s / 2, then c := 0. 
+      If p >= m - (s / 2), then c := m - s. 
+      Otherwise, c := p - (s / 2). 
+  */
+  getCameraPos(screen) {
+    let camera = new Vector2(0, 0);
+    let halfScreen = screen.scalar(0.5).floor();
+    let mapX = this.tiles[0].length;
+    let mapY = this.tiles.length;
 
-      if (x - dungeon.playerStart.x <= baseExploreRadius && y - dungeon.playerStart.y <= baseExploreRadius) {
-        tile.explored = true;
-      }
-
-
-      // tile.explored = true;
-      if (dungeon.isWall([x, y])) {
-        tile.isWall = true;
-        tile.impassable = true;
-      } else {
-        tile.isCorridor = true;
-      }
-      row.push(tile);
-
-      //row.push(dungeon.walls.get([x, y]) ? tui.preRender.wall : tui.preRender.corridor);
+    if (this.player.pos.x < halfScreen.x) {
+      // TODO remove as performance optimization?
+      camera.x = 0;
+    } else if (this.player.pos.x >= mapX - halfScreen.x) {
+      camera.x = mapX - screen.x;
+    } else {
+      camera.x = this.player.pos.x - halfScreen.x;
     }
-  }
 
-  for (let i = 0; i < renderScaling; i++) {
-    baseMap.push(row);
-  }
-}
-
-let playerPosition = dungeon.playerStart.scalar(renderScaling).floor();
-
-
-
-// welcome message
-let msg = "You awaken in a dark dungeon and can only see a faint light from an opening at the top - try to survive.";
-
-tui.popupMessage(msg, function () {
-  // initial screen drawing
-  let screenOut = refresh(playerPosition, tui.getMainViewSize(), baseMap);
-  tui.setMainContent(screenOut);
-});
-
-// refresh render on screen resize
-tui.onScreenResize(function () {
-  let screenOut = refresh(playerPosition, tui.getMainViewSize(), baseMap);
-  tui.setMainContent(screenOut);
-})
-
-// react to user input with WASD / arrow keys, move player only for now
-tui.onKeypress(function (ch, key) {
-  let origPos = playerPosition.clone();
-  switch (key.name) {
-    case "w":
-    case "up":
-      playerPosition.y -= playerSpeed;
-      break;
-    case "a":
-    case "left":
-      playerPosition.x -= playerSpeed;
-      break;
-    case "s":
-    case "down":
-      playerPosition.y += playerSpeed;
-      break;
-    case "d":
-    case "right":
-      playerPosition.x += playerSpeed;
-      break;
-  }
-
-  // TODO model game state and check against baseMap as well as dynamic objects
-  if (baseMap[playerPosition.y][playerPosition.x].impassable) {
-    playerPosition = origPos;
-    return;
-  }
-
-  let startY = playerPosition.y - scaledExploreRadius;
-  startY = startY < 0 ? 0 : startY;
-  let endY = playerPosition.y + scaledExploreRadius;
-
-  let startX = playerPosition.x - scaledExploreRadius;
-  startX = startX < 0 ? 0 : startX;
-  let endX = playerPosition.x + scaledExploreRadius;
-
-
-
-
-  for (let y = startY; y < endY; y++) {
-    if (baseMap.length < y + 1) {
-      break;
+    if (this.player.pos.y < halfScreen.y) {
+      // TODO remove as performance optimization?
+      camera.y = 0;
+    } else if (this.player.pos.y >= mapY - halfScreen.y) {
+      camera.y = mapY - screen.y;
+    } else {
+      camera.y = this.player.pos.y - halfScreen.y;
     }
-    for (let x = startX; x < endX; x++) {
-      if (baseMap[y].length < x + 1) {
-        break;
-      }
-      baseMap[y][x].explored = true;
-    }
+
+    return camera;
   }
 
-  let time1 = new Date();
-  let screenOut = refresh(playerPosition, tui.getMainViewSize(), baseMap);
-  tui.setMainContent(screenOut);
-  let time2 = new Date();
-  tui.debug(time2 - time1);
+  refreshScreen() {
+    let buf = [];
+    let x, y = 0;
+    let viewSizeAvail = this.tui.getMainViewSize().sub(new Vector2(2, 2));
 
+    let camera = this.getCameraPos(viewSizeAvail);
+    for (y = camera.y; y < viewSizeAvail.y + camera.y; y++) {
+      for (x = camera.x; x < viewSizeAvail.x + camera.x; x++) {
+        if (this.tiles.length > y && this.tiles[y].length > x) {
 
-});
+          if (this.player.pos.x === x && this.player.pos.y === y) {
+            // Render player at current position
+            buf.push(this.tui.preRender.player);
+            continue;
+          }
 
-
-/*
-getCameraPos implements a scrolling map camera position centered on the player.
-Algorithm from http://www.roguebasin.com/index.php?title=Scrolling_map
-    Let s be the dimensions of the screen, p be the player coordinates, and c be the coordinates of the upper left of the camera: 
-    If p < s / 2, then c := 0. 
-    If p >= m - (s / 2), then c := m - s. 
-    Otherwise, c := p - (s / 2). 
-*/
-function getCameraPos(player, screen, mapX, mapY) {
-  let camera = new Vector2(0, 0);
-  let halfScreen = screen.scalar(0.5).floor();
-
-
-  if (player.x < halfScreen.x) {
-    // TODO remove as performance optimization?
-    camera.x = 0;
-  } else if (player.x >= mapX - halfScreen.x) {
-    camera.x = mapX - screen.x;
-  } else {
-    camera.x = player.x - halfScreen.x;
-  }
-
-  if (player.y < halfScreen.y) {
-    // TODO remove as performance optimization?
-    camera.y = 0;
-  } else if (player.y >= mapY - halfScreen.y) {
-    camera.y = mapY - screen.y;
-  } else {
-    camera.y = player.y - halfScreen.y;
-  }
-
-  return camera;
-}
-
-
-function refresh(playerPosition, viewSize, map) {
-  let buf = [];
-  let x, y = 0;
-
-  let viewSizeAvail = viewSize.sub(new Vector2(2, 2));
-
-  let camera = getCameraPos(playerPosition, viewSizeAvail, map[0].length, map.length);
-  for (y = camera.y; y < viewSizeAvail.y + camera.y; y++) {
-    for (x = camera.x; x < viewSizeAvail.x + camera.x; x++) {
-      if (map.length > y && map[y].length > x) {
-
-        if (playerPosition.x === x && playerPosition.y === y) {
-          // Render player at current position
-          buf.push(tui.preRender.player);
-          continue;
+          buf.push(this.tiles[y][x].renderString(this.tui));
+        } else {
+          // Rendering screen larger than map
+          buf.push("*");
         }
 
-        buf.push(map[y][x].renderString());
-      } else {
-        // Rendering screen larger than map
-        buf.push("*");
+      }
+      buf.push("\n");
+    }
+
+    this.tui.setMainContent(buf.join(""));
+  }
+
+  welcomeMessage() {
+    // welcome message
+    let msg = "You awaken in a dark dungeon and can only see a faint light from an opening at the top - try to survive.";
+    let game = this;
+    this.tui.popupMessage(msg, function () {
+      // initial screen drawing
+      game.refreshScreen();
+    });
+  }
+
+  setEventHandler() {
+    let game = this;
+    // refresh render on screen resize
+    this.tui.onScreenResize(function () {
+      game.refreshScreen();
+    })
+
+
+    // react to user input with WASD / arrow keys, move player only for now
+    this.tui.onKeypress(function (ch, key) {
+      let origPos = game.player.pos.clone();
+      switch (key.name) {
+        case "w":
+        case "up":
+          game.player.pos.y -= game.parameters.playerSpeed;
+          break;
+        case "a":
+        case "left":
+          game.player.pos.x -= game.parameters.playerSpeed;
+          break;
+        case "s":
+        case "down":
+          game.player.pos.y += game.parameters.playerSpeed;
+          break;
+        case "d":
+        case "right":
+          game.player.pos.x += game.parameters.playerSpeed;
+          break;
       }
 
-    }
-    buf.push("\n");
+      // TODO model game state and check against this.tiles as well as dynamic objects
+      if (game.tiles[game.player.pos.y][game.player.pos.x].impassable) {
+        game.player.pos = origPos;
+        return;
+      }
+
+      let startY = game.player.pos.y - game.parameters.scaledExploreRadius;
+      startY = startY < 0 ? 0 : startY;
+      let endY = game.player.pos.y + game.parameters.scaledExploreRadius;
+
+      let startX = game.player.pos.x - game.parameters.scaledExploreRadius;
+      startX = startX < 0 ? 0 : startX;
+      let endX = game.player.pos.x + game.parameters.scaledExploreRadius;
+
+      for (let y = startY; y < endY; y++) {
+        if (game.tiles.length < y + 1) {
+          break;
+        }
+        for (let x = startX; x < endX; x++) {
+          if (game.tiles[y].length < x + 1) {
+            break;
+          }
+          game.tiles[y][x].explored = true;
+        }
+      }
+
+      let time1 = new Date();
+      game.refreshScreen();
+      let time2 = new Date();
+      game.tui.debug(time2 - time1);
+    });
   }
-  return buf.join("");
+
+  setupMap() {
+    let initialExploreRadius = this.parameters.initalExploreFactor * this.parameters.baseExploreRadius;
+
+    for (let y = 0; y < this.dungeon.size.y; y++) {
+      let row = [];
+      for (let x = 0; x < this.dungeon.size.x; x++) {
+        for (let i = 0; i < this.parameters.renderScaling; i++) {
+
+          let tile = new Tile();
+          if (Math.abs(x - this.dungeon.playerStart.x) <= initialExploreRadius &&
+            Math.abs(y - this.dungeon.playerStart.y) <= initialExploreRadius) {
+            tile.explored = true;
+          }
+
+          // tile.explored = true;
+          if (this.dungeon.isWall([x, y])) {
+            tile.isWall = true;
+            tile.impassable = true;
+          } else {
+            tile.isCorridor = true;
+          }
+          row.push(tile);
+
+          //row.push(dungeon.walls.get([x, y]) ? tui.preRender.wall : tui.preRender.corridor);
+        }
+      }
+
+      for (let i = 0; i < this.parameters.renderScaling; i++) {
+        this.tiles.push(row);
+      }
+    }
+
+  }
+
+  constructor() {
+    this.tui = new TerminalInterface();
+    this.dungeon = new Dungeon();
+
+    this.parameters.scaledExploreRadius = this.parameters.renderScaling * this.parameters.baseExploreRadius;
+
+    this.player = new Player("Jenny", this.dungeon.playerStart.scalar(this.parameters.renderScaling).floor());
+
+    // Event handler cannot access the correct 'this'
+
+    this.setupMap()
+    this.welcomeMessage(); // welcome message triggers initial screen rendering in callback
+    this.setEventHandler();
+  }
+
 }
+
+// Entry point
+let game = new Game();
