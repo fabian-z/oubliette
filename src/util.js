@@ -32,3 +32,12 @@ export class Vector2 {
     }
 
 }
+
+//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+//MIT License
+//The returned value is no lower than (and may possibly equal) min, and is less than (and not equal) max.
+export function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+  }

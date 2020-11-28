@@ -1,6 +1,7 @@
 import { TerminalInterface } from './tui.js';
 import { Dungeon } from './dungeon.js';
-import { Vector2 } from './util.js'
+import { Vector2 } from './util.js';
+import { generateRandomMonster } from './monster.js';
 
 
 class Tile {
@@ -246,8 +247,6 @@ class Game {
     this.parameters.scaledExploreRadius = this.parameters.renderScaling * this.parameters.baseExploreRadius;
 
     this.player = new Player("Jenny", this.dungeon.playerStart.scalar(this.parameters.renderScaling).floor());
-
-    // Event handler cannot access the correct 'this'
 
     this.setupMap()
     this.welcomeMessage(); // welcome message triggers initial screen rendering in callback
