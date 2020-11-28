@@ -1,8 +1,6 @@
 import { TerminalInterface } from './tui.js';
 import { Dungeon } from './dungeon.js';
 import { Vector2 } from './util.js';
-import { generateRandomMonster } from './monster.js';
-
 
 class Tile {
   isWall;
