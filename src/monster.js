@@ -1,10 +1,10 @@
 import { getRandomName } from "./lang.js";
-import { getRandomInt } from './util.js';
+import { getRandomInt, Vector2 } from './util.js';
 
 // TODO Autonomous movement
 export class Monster {
     name;
-    pos;
+    pos = new Vector2(0, 0);
     type;
     symbol;
     damage;
@@ -17,7 +17,9 @@ let types = [
     {name: 'Bat', symbol: "B"},
     {name: 'Rat', symbol: "R"},
     {name: 'Undead', symbol: "U"},
-    {name: 'Dragon', symbol: "D"},
+    {name: 'Troll', symbol: "T"},
+    {name: 'Warg', symbol: "W"},
+    {name: 'Spider', symbol: "S"},
 ];
 
 export function getRandomType() {

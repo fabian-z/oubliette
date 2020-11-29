@@ -1,17 +1,37 @@
 import { TerminalInterface } from './tui.js';
 import { Dungeon } from './dungeon.js';
-import { Vector2 } from './util.js';
+import { getRandomInt, Vector2 } from './util.js';
+import { Monster, generateRandomMonster } from './monster.js';
 
 class Tile {
   isWall;
+  isRoom;
   isCorridor;
+  roomTag;
 
   impassable;
   explored;
   hasPlayer;
 
-  items = [];
-  monsters = [];
+  item;
+  monster;
+
+  clone() {
+    // custom clone function
+    // https://stackoverflow.com/questions/57542052/deep-clone-class-instance-javascript
+    let tile = new Tile();
+    tile.isWall = this.isWall;
+    tile.isCorridor = this.isCorridor;
+    tile.isRoom = this.isRoom;
+    tile.roomTag = this.roomTag;
+
+    tile.impassable = this.impassable;
+    tile.explored = this.explored;
+    tile.hasPlayer = this.hasPlayer;
+    tile.item = this.item;
+    tile.monster = this.monster;
+    return tile;
+  }
 
   renderString(tui) {
     if (this.hasPlayer) {
@@ -20,12 +40,18 @@ class Tile {
     if (!this.explored) {
       return " ";
     }
+    if (this.monster instanceof Monster) {
+      return tui.preRender.monsterPrefix + this.monster.symbol + tui.preRender.monsterSuffix;
+    }
     if (this.isWall) {
       return tui.preRender.wall;
     }
-    if (this.isCorridor) {
+
+    // empty
+    if (this.isCorridor || this.isRoom) {
       return tui.preRender.corridor;
     }
+
   }
 }
 
@@ -35,7 +61,6 @@ class Player {
   experience = 0;
   level = 1;
   name = "";
-
 
   constructor(name, pos) {
     this.name = name;
@@ -53,8 +78,9 @@ class Player {
 class Game {
   tiles = []; // [y][x] 2d array
   monsters = [];
-  items;
+  items = [];
   player;
+  level = 1;
   tui;
 
   // should be class internal as implementation detail, TODO: getter functions
@@ -133,7 +159,7 @@ class Game {
 
   welcomeMessage() {
     // welcome message
-    let msg = "You awaken in a dark dungeon and can only see a faint light from an opening at the top - try to survive.";
+    let msg = "You awaken in a dark dungeon and can only see a faint light from an opening at the top - defeat all monsters to survive.";
     let game = this;
     this.tui.popupMessage(msg, function () {
       // initial screen drawing
@@ -147,7 +173,6 @@ class Game {
     this.tui.onScreenResize(function () {
       game.refreshScreen();
     })
-
 
     // react to user input with WASD / arrow keys, move player only for now
     this.tui.onKeypress(function (ch, key) {
@@ -218,13 +243,23 @@ class Game {
             tile.explored = true;
           }
 
-          // tile.explored = true;
-          if (this.dungeon.isWall([x, y])) {
+          tile.explored = true;
+
+          let curPos = new Vector2(x, y);
+
+          if (this.dungeon.isWall(curPos)) {
             tile.isWall = true;
             tile.impassable = true;
           } else {
-            tile.isCorridor = true;
+            let room = this.dungeon.getRoom(curPos);
+            if (room) {
+              tile.isRoom = true;
+              tile.roomTag = room.tag;
+            } else {
+              tile.isCorridor = true;
+            }
           }
+
           row.push(tile);
 
           //row.push(dungeon.walls.get([x, y]) ? tui.preRender.wall : tui.preRender.corridor);
@@ -232,10 +267,54 @@ class Game {
       }
 
       for (let i = 0; i < this.parameters.renderScaling; i++) {
-        this.tiles.push(row);
+        let newRow = [];
+        for (let tile of row) {
+          newRow.push(tile.clone());
+        }
+        this.tiles.push(newRow);
       }
     }
 
+  }
+
+  setupMonsters() {
+    this.monsters = [];
+
+    for (let i = 0; i <= 20; i++) {
+      let monster = generateRandomMonster();
+    
+      // Cap random monster placement for worst case performance
+      // Also makes the linter happy (constant condition error for while (true))
+      let cap = 0;
+      while (cap < 100) {
+        cap++;
+        let x = getRandomInt(0, this.tiles[0].length);
+        let y = getRandomInt(0, this.tiles.length);
+        let curTile = this.tiles[y][x];
+
+        if (this.player.pos.x === x && this.player.pos.y === y) {
+          continue;
+        }
+
+         //assume that tiles are already populated
+        if (curTile.isWall || curTile.monster instanceof Monster) {
+          continue;
+        }
+        
+        if (curTile.roomTag == "initial" || curTile.isCorridor) {
+          continue
+        }
+
+        // TODO check for other monsters, items
+
+        curTile.monster = monster;
+        curTile.impassable = true;
+        monster.pos.x = x;
+        monster.pos.y = y;
+        break;
+      }
+      this.monsters.push(monster);
+    }
   }
 
   constructor() {
@@ -247,6 +326,7 @@ class Game {
     this.player = new Player("Jenny", this.dungeon.playerStart.scalar(this.parameters.renderScaling).floor());
 
     this.setupMap()
+    this.setupMonsters();
     this.welcomeMessage(); // welcome message triggers initial screen rendering in callback
     this.setEventHandler();
   }

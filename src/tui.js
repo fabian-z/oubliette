@@ -163,6 +163,8 @@ export class TerminalInterface {
         this.preRender.player = blessed.parseTags("{green-fg}{bold}@{/bold}{/green-fg}");
         this.preRender.wall = blessed.parseTags("█");
         this.preRender.corridor = blessed.parseTags(" ");
+        this.preRender.monsterPrefix = blessed.parseTags("{red-fg}{bold}");
+        this.preRender.monsterSuffix = blessed.parseTags("{/bold}{/red-fg}");
 
         // Focus our element.
         this.mainView.focus();

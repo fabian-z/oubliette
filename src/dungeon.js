@@ -7,7 +7,18 @@ export class Dungeon {
     playerStart;
 
     isWall(pos) {
-        return this.generated.walls.get(pos);
+        return this.generated.walls.get([pos.x, pos.y]);
+    }
+
+    getRoom(pos) {
+        for (let piece of this.generated.children) {
+            if (pos.x >= piece.position[0] && pos.x <= piece.position[0] + piece.size[0]) {
+                if (pos.y >= piece.position[1] && pos.y <= piece.position[1] + piece.size[1]) {
+                    return piece
+                }
+            }
+        }
+        return false
     }
 
     constructor() {
