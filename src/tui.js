@@ -7,6 +7,7 @@ export class TerminalInterface {
     mainView;
     rightView;
     preRender = {};
+    playerName;
 
     setMainContent(content) {
         this.mainView.setContent(content);
@@ -124,7 +125,7 @@ export class TerminalInterface {
             parent: this.screen,
             width: '50%',
             height: "10%",
-            content: " Player: Anonymous\n\n\n\n HP"
+            content: " Player: Jenny\n\n\n\n HP"
         });
         
         let gauge = blessed.progressbar({

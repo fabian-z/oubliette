@@ -7,6 +7,7 @@ export class Monster {
     pos = new Vector2(0, 0);
     type;
     symbol;
+    health = 100;
     damage;
     xp;
     loot = [];

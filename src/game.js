@@ -9,6 +9,8 @@ class Tile {
   isCorridor;
   roomTag;
 
+  pathPlayerValue; //Dijkstra Map value, http://www.roguebasin.com/index.php?title=The_Incredible_Power_of_Dijkstra_Maps
+
   impassable;
   explored;
   hasPlayer;
@@ -67,12 +69,6 @@ class Player {
     this.pos = pos;
   }
 
-  move(x, y) {
-    this.pos.x = x;
-    this.pos.y = y;
-  }
-
-
 }
 
 class Game {
@@ -91,6 +87,42 @@ class Game {
     baseExploreRadius: 3,
     initalExploreFactor: 2,
     playerSpeed: 1
+  }
+
+  movePlayer(pos) {
+    //move, then regenerate Dijkstra map
+    this.player.pos = pos;
+
+    let origPos = this.player.pos.clone();
+    
+    // TODO model game state and check against this.tiles as well as dynamic objects
+    if (this.tiles[this.player.pos.y][this.player.pos.x].impassable) {
+      this.player.pos = origPos;
+      return false;
+    }
+
+    let startY = this.player.pos.y - this.parameters.scaledExploreRadius;
+    startY = startY < 0 ? 0 : startY;
+    let endY = this.player.pos.y + this.parameters.scaledExploreRadius;
+
+    let startX = this.player.pos.x - this.parameters.scaledExploreRadius;
+    startX = startX < 0 ? 0 : startX;
+    let endX = this.player.pos.x + this.parameters.scaledExploreRadius;
+
+    for (let y = startY; y < endY; y++) {
+      if (this.tiles.length < y + 1) {
+        break;
+      }
+      for (let x = startX; x < endX; x++) {
+        if (this.tiles[y].length < x + 1) {
+          break;
+        }
+        this.tiles[y][x].explored = true;
+      }
+    }
+
+    return true;
+
   }
 
   /*
@@ -176,56 +208,34 @@ class Game {
 
     // react to user input with WASD / arrow keys, move player only for now
     this.tui.onKeypress(function (ch, key) {
-      let origPos = game.player.pos.clone();
+    
+    let pos = game.player.pos.clone();
       switch (key.name) {
         case "w":
         case "up":
-          game.player.pos.y -= game.parameters.playerSpeed;
+          pos.y -= game.parameters.playerSpeed;
           break;
         case "a":
         case "left":
-          game.player.pos.x -= game.parameters.playerSpeed;
+          pos.x -= game.parameters.playerSpeed;
           break;
         case "s":
         case "down":
-          game.player.pos.y += game.parameters.playerSpeed;
+          pos.y += game.parameters.playerSpeed;
           break;
         case "d":
         case "right":
-          game.player.pos.x += game.parameters.playerSpeed;
+          pos.x += game.parameters.playerSpeed;
           break;
       }
 
-      // TODO model game state and check against this.tiles as well as dynamic objects
-      if (game.tiles[game.player.pos.y][game.player.pos.x].impassable) {
-        game.player.pos = origPos;
-        return;
+      if (game.movePlayer(pos)) {
+        let time1 = new Date();
+        game.refreshScreen();
+        let time2 = new Date();
+        game.tui.debug(time2 - time1);
       }
 
-      let startY = game.player.pos.y - game.parameters.scaledExploreRadius;
-      startY = startY < 0 ? 0 : startY;
-      let endY = game.player.pos.y + game.parameters.scaledExploreRadius;
-
-      let startX = game.player.pos.x - game.parameters.scaledExploreRadius;
-      startX = startX < 0 ? 0 : startX;
-      let endX = game.player.pos.x + game.parameters.scaledExploreRadius;
-
-      for (let y = startY; y < endY; y++) {
-        if (game.tiles.length < y + 1) {
-          break;
-        }
-        for (let x = startX; x < endX; x++) {
-          if (game.tiles[y].length < x + 1) {
-            break;
-          }
-          game.tiles[y][x].explored = true;
-        }
-      }
-
-      let time1 = new Date();
-      game.refreshScreen();
-      let time2 = new Date();
-      game.tui.debug(time2 - time1);
     });
   }
 
@@ -235,18 +245,17 @@ class Game {
     for (let y = 0; y < this.dungeon.size.y; y++) {
       let row = [];
       for (let x = 0; x < this.dungeon.size.x; x++) {
-        for (let i = 0; i < this.parameters.renderScaling; i++) {
+        let curPos = new Vector2(x, y);
 
+        for (let i = 0; i < this.parameters.renderScaling; i++) {
           let tile = new Tile();
           if (Math.abs(x - this.dungeon.playerStart.x) <= initialExploreRadius &&
             Math.abs(y - this.dungeon.playerStart.y) <= initialExploreRadius) {
             tile.explored = true;
           }
 
-          tile.explored = true;
-
-          let curPos = new Vector2(x, y);
-
+          tile.explored =  true;
+          //tile.explored = true
           if (this.dungeon.isWall(curPos)) {
             tile.isWall = true;
             tile.impassable = true;
@@ -288,11 +297,10 @@ class Game {
       let cap = 0;
       while (cap < 100) {
         cap++;
-        let x = getRandomInt(0, this.tiles[0].length);
-        let y = getRandomInt(0, this.tiles.length);
-        let curTile = this.tiles[y][x];
+        let pos = new Vector2(getRandomInt(0, this.tiles[0].length), getRandomInt(0, this.tiles.length));
+        let curTile = this.tiles[pos.y][pos.x];
 
-        if (this.player.pos.x === x && this.player.pos.y === y) {
+        if (this.player.pos.equal(pos)) {
           continue;
         }
 
@@ -309,8 +317,7 @@ class Game {
 
         curTile.monster = monster;
         curTile.impassable = true;
-        monster.pos.x = x;
-        monster.pos.y = y;
+        monster.pos = pos;
         break;
       }
       this.monsters.push(monster);
@@ -329,6 +336,31 @@ class Game {
     this.setupMonsters();
     this.welcomeMessage(); // welcome message triggers initial screen rendering in callback
     this.setEventHandler();
+
+    let game = this;
+    setInterval(function() {
+      for (let monster of game.monsters) {
+        let origPos = monster.pos.clone();
+        let origTile = game.tiles[monster.pos.y][monster.pos.x];
+
+        
+        monster.pos = monster.pos.add(new Vector2(getRandomInt(-1, 2), getRandomInt(-1, 2)));
+
+        if (game.player.pos.equal(monster.pos) || game.tiles.length <= monster.pos.y || game.tiles[0].length <= monster.pos.x || 
+          game.tiles[monster.pos.y][monster.pos.x].impassable) {
+          monster.pos = origPos;
+          continue
+        }
+
+        origTile.monster = undefined;
+        origTile.impassable = false;
+
+        game.tiles[monster.pos.y][monster.pos.x].monster = monster;
+       // game.tiles[monster.pos.y][monster.pos.x].monster = monster;
+      }
+      game.refreshScreen();
+      
+    }, 100);
   }
 
 }

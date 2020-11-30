@@ -27,6 +27,10 @@ export class Vector2 {
         return new Vector2(Math.floor(this.x), Math.floor(this.y));
     }
 
+    equal(vec) {
+        return vec.x === this.x && vec.y === this.y;
+    }
+
     toString() {
         return `[${this.x},${this.y}]`;
     }
