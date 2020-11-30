@@ -7,6 +7,8 @@ export class Monster {
     pos = new Vector2(0, 0);
     type;
     symbol;
+    speed;
+    active = false;
     health = 100;
     damage;
     xp;
@@ -14,13 +16,13 @@ export class Monster {
 }
 
 let types = [
-    {name: 'Orc', symbol: "O"},
-    {name: 'Bat', symbol: "B"},
-    {name: 'Rat', symbol: "R"},
-    {name: 'Undead', symbol: "U"},
-    {name: 'Troll', symbol: "T"},
-    {name: 'Warg', symbol: "W"},
-    {name: 'Spider', symbol: "S"},
+    {name: 'Orc', symbol: "O", speed: 1},
+    {name: 'Bat', symbol: "B", speed: 2},
+    {name: 'Rat', symbol: "R", speed: 1},
+    {name: 'Undead', symbol: "U", speed: 1},
+    {name: 'Troll', symbol: "T", speed: 1},
+    {name: 'Warg', symbol: "W", speed: 1},
+    {name: 'Spider', symbol: "S", speed: 1}
 ];
 
 export function getRandomType() {
@@ -35,6 +37,7 @@ export function generateRandomMonster() {
     let type = getRandomType();
     monster.type = type.name;
     monster.symbol = type.symbol;
+    monster.speed = type.speed;
     
     // TODO make configurable
     monster.damage = getRandomInt(1, 10);
