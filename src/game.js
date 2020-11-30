@@ -19,6 +19,7 @@ class Tile {
 
   item;
   monster;
+  monsterInterval;
 
   clone() {
     // custom clone function
@@ -75,7 +76,7 @@ class Player {
 
 class Game {
   tiles = []; // [y][x] 2d array
-  floorMap = [] // Vector2 array with floor tiles, used to speed up pathfinding
+  floorMap = []; // array with floor tiles, used to speed up pathfinding
   monsters = [];
   items = [];
   player;
@@ -91,7 +92,8 @@ class Game {
     initalExploreFactor: 2,
     playerSpeed: 1,
     maxMonsterPath: 50, // careful with performance!
-    monsterInterval: 200
+    monsterInterval: 200,
+    monsterCount: 20
   }
 
   movePlayer(pos) {
@@ -127,6 +129,17 @@ class Game {
       }
     }
 
+    this.refreshPlayerPath();
+
+    //let time3 = new Date() - time2;
+    //console.log(time3);
+    //process.exit(1);
+
+    return true;
+
+  }
+
+  refreshPlayerPath() {
     // Refresh Dijkstra map values
 
     /* From http://www.roguebasin.com/index.php?title=The_Incredible_Power_of_Dijkstra_Maps
@@ -140,51 +153,44 @@ class Game {
 
 
    const max = this.parameters.maxMonsterPath;
-    //let time1 = new Date();
-    for (let y = 0; y < this.tiles.length; y++) {
-      for (let x = 0; x < this.tiles[0].length; x++) {
-        if (this.player.pos.y === y && this.player.pos.x === x) {
-          // Goal position, guide toward player
-          this.tiles[y][x].pathPlayerValue = 0;
-          continue;
-        }
-        this.tiles[y][x].pathPlayerValue = max;
-      }
-    }
-    //let time2 = new Date();
-    //console.log(time2 - time1);
-    let changed;
-    let min, curTile, neighbour;
+   //let time1 = new Date();
+   for (let y = 0; y < this.tiles.length; y++) {
+     for (let x = 0; x < this.tiles[0].length; x++) {
+       if (this.player.pos.y === y && this.player.pos.x === x) {
+         // Goal position, guide toward player
+         this.tiles[y][x].pathPlayerValue = 0;
+         continue;
+       }
+       this.tiles[y][x].pathPlayerValue = max;
+     }
+   }
+   //let time2 = new Date();
+   //console.log(time2 - time1);
+   let changed;
+   let min, curTile, neighbour;
 
-    do {
-      changed = false;
+   do {
+     changed = false;
 
-      for (curTile of this.floorMap) {
-        min = max;
-        //let curTile = this.tiles[curPos.y][curPos.x];
+     for (curTile of this.floorMap) {
+       min = max;
+       //let curTile = this.tiles[curPos.y][curPos.x];
 
-        for (neighbour of curTile.neighbours) {
-          if (min > neighbour.pathPlayerValue) {
-            min = neighbour.pathPlayerValue;
-          }
-        }
+       for (neighbour of curTile.neighbours) {
+         if (min > neighbour.pathPlayerValue) {
+           min = neighbour.pathPlayerValue;
+         }
+       }
 
-        min += 1;
-        if (curTile.pathPlayerValue > min) {
-          curTile.pathPlayerValue = min;
-          changed = true;
-        }
+       min += 1;
+       if (curTile.pathPlayerValue > min) {
+         curTile.pathPlayerValue = min;
+         changed = true;
+       }
 
-      }
+     }
 
-    } while (changed)
-
-    //let time3 = new Date() - time2;
-    //console.log(time3);
-    //process.exit(1);
-
-    return true;
-
+   } while (changed)
   }
 
   getNeighbourTiles(pos) {
@@ -204,8 +210,6 @@ class Game {
     }
     return neighbours;
   }
-
-
 
   /*
   getCameraPos implements a scrolling map camera position centered on the player.
@@ -271,14 +275,20 @@ class Game {
     this.tui.setMainContent(buf.join(""));
   }
 
-  welcomeMessage() {
+  welcomeMessage(callback) {
     // welcome message
     let msg = "You awaken in a dark dungeon and can only see a faint light from an opening at the top - defeat all monsters to survive.";
     let game = this;
-    this.tui.popupMessage(msg, function () {
-      // initial screen drawing
-      game.refreshScreen();
-    });
+    this.tui.popupMessage(msg, callback);
+  }
+
+  gameOverMessage() {
+    this.tui.disableKeys();
+    clearInterval(this.monsterInterval);
+    let msg = "Game over!";
+    this.tui.popupMessage(msg, function() {
+      process.exit(0);
+    })
   }
 
   setEventHandler() {
@@ -324,6 +334,7 @@ class Game {
   setupMap() {
     let initialExploreRadius = this.parameters.initalExploreFactor * this.parameters.baseExploreRadius;
 
+    //initial rendering of dungeon to map tiles
     for (let y = 0; y < this.dungeon.size.y; y++) {
       let row = [];
       for (let x = 0; x < this.dungeon.size.x; x++) {
@@ -366,6 +377,7 @@ class Game {
       }
     }
 
+    // post-process map tiles to fill position, neighbours and floorMap
     for (let y = 0; y < this.tiles.length; y++) {
       for (let x = 0; x < this.tiles[0].length; x++) {
         let curTile = this.tiles[y][x];
@@ -385,7 +397,7 @@ class Game {
   setupMonsters() {
     this.monsters = [];
 
-    for (let i = 0; i <= 20; i++) {
+    for (let i = 0; i <= this.parameters.monsterCount; i++) {
       let monster = generateRandomMonster();
 
       // Cap random monster placement for worst case performance
@@ -423,7 +435,7 @@ class Game {
 
   startProcessingMonsters() {
     let game = this;
-    setInterval(function () {
+    this.monsterInterval = setInterval(function () {
       for (let monster of game.monsters) {
         for (let i = 0; i <= monster.speed; i++) {
         let origPos = monster.pos.clone();
@@ -442,6 +454,12 @@ class Game {
           if (!target || target.pathPlayerValue > neighbour.pathPlayerValue) {
             target = neighbour;
           }
+        }
+
+        if (game.player.pos.equal(target.pos)) {
+          // Monster is next to player, attack
+          game.player.health -= monster.damage;
+          continue;
         }
 
         monster.pos = target.pos;
@@ -473,14 +491,22 @@ class Game {
 
     this.player = new Player("Jenny", this.dungeon.playerStart.scalar(this.parameters.renderScaling).floor());
 
-    this.setupMap()
-    //hack
-    this.movePlayer(this.player.pos);
+    this.setupMap();
+    this.refreshPlayerPath();
     this.setupMonsters();
-    this.welcomeMessage(); // welcome message triggers initial screen rendering in callback
-    this.setEventHandler();
-    this.startProcessingMonsters();
+    
+    let game = this;
+    this.welcomeMessage(function() {
+      
+      game.setEventHandler();
+     game.startProcessingMonsters();
+     game.refreshScreen();
+      
+    }); // welcome message triggers initial screen rendering in callback
+    
+  
 
+    this.tui.setHealth(50);
   }
 
 }

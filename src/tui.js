@@ -7,10 +7,23 @@ export class TerminalInterface {
     mainView;
     rightView;
     preRender = {};
+    
+    // sidebar
     playerName;
+    healthGauge;
+    eventLog;
 
     setMainContent(content) {
         this.mainView.setContent(content);
+        this.screen.render();
+    }
+
+    setPlayerName(name) {
+        this.playerName = name;
+    }
+
+    setHealth(percent) {
+        this.healthGauge.setProgress(percent);
         this.screen.render();
     }
 
@@ -24,6 +37,10 @@ export class TerminalInterface {
 
     onKeypress(callback) {
         this.screen.on("keypress", callback);
+    }
+
+    disableKeys() {
+        this.screen.disableKeys();
     }
 
     debug(...msg) {
@@ -53,7 +70,11 @@ export class TerminalInterface {
 
         });
         this.mainView.append(messageBox);
-        messageBox.display(msg, 0, callback == undefined ? callback : function(){});
+        messageBox.display(msg, 0, function() {
+            if (callback != undefined) {
+                callback();
+            }
+        });
     }
 
     constructor() {
@@ -121,14 +142,22 @@ export class TerminalInterface {
         this.screen.append(this.rightView);
 
         //let gauge = contrib.gauge({label: 'Progress', stroke: 'green', fill: 'white'});
-        let gaugeLabel = blessed.box({
+        this.playerName = blessed.box({
             parent: this.screen,
             width: '50%',
             height: "10%",
-            content: " Player: Jenny\n\n\n\n HP"
+            content: "Player: Jenny\n\n\n\n"
+        });
+
+        let label = blessed.box({
+            parent: this.screen,
+            top: 5,
+            width: '50%',
+            height: "10%",
+            content: "HP"
         });
         
-        let gauge = blessed.progressbar({
+        this.healthGauge = blessed.progressbar({
             parent: this.screen,
             border: 'line',
             style: {
@@ -151,9 +180,12 @@ export class TerminalInterface {
             filled: 0
         });
 
-        this.rightView.append(gaugeLabel);
-        this.rightView.append(gauge);
-        gauge.setProgress(50);
+        this.rightView.append(this.playerName);
+
+        this.rightView.append(label);
+        this.rightView.append(this.healthGauge);
+        
+        this.healthGauge.setProgress(100);
 
 
         // Quit on Escape, q, or Control-C.
