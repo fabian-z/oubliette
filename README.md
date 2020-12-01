@@ -19,18 +19,23 @@ Project work for lecture Programming I
 
 
 * Rouge-like game with monospace ASCII / UTF-8 art interface
-  * Procedurally generated maps / dungeons
-    * Research algorithms and test JS implementations
-  * Random distribution of monsters and items
-  * Track player status (health points, experience, character name)
-* Controlled with keyboard
-  * Arrow keys, WASD
+  * Procedurally generated maps / dungeons ☑
+    * Research algorithms and test JS implementations ☑
+  * Random distribution of monsters ☑ and items
+  * Track player status (health points ☑, experience, character name)
+* Controlled with keyboard ☑
+  * Arrow keys, WASD ☑
 * Split-screen with player and game status
 
 # Nice to have
-  
+
+* Map exploration ☑
+* Good monster pathfinding ☑
+  * Uses Dijkstra map, a simplified algorithm where all edges have identical weight
+  * Pathfinding is executed on a separate worker thread
+
 * Saving of application state / game player progress 
-  * Save random seed or entire level map?
+  * -> Save level map but keep permadeath?
 * Research of UX with different algorithm parameters (map generation, distribution rules)
 * Event logs
 * Different weapons?
@@ -38,4 +43,3 @@ Project work for lecture Programming I
 * Difficulty selection
   * Hard, Medium, Easy - with different game balancing
 * Help screen / signs and symbols explanation for improved UX
-* Map exploration
