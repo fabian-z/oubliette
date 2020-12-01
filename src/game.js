@@ -92,7 +92,7 @@ class Game {
     initalExploreFactor: 2,
     playerSpeed: 1,
     maxMonsterPath: 50, // careful with performance!
-    monsterInterval: 200,
+    monsterInterval: 1000,
     monsterCount: 20
   }
 
@@ -152,45 +152,45 @@ class Game {
     */
 
 
-   const max = this.parameters.maxMonsterPath;
-   //let time1 = new Date();
-   for (let y = 0; y < this.tiles.length; y++) {
-     for (let x = 0; x < this.tiles[0].length; x++) {
-       if (this.player.pos.y === y && this.player.pos.x === x) {
-         // Goal position, guide toward player
-         this.tiles[y][x].pathPlayerValue = 0;
-         continue;
-       }
-       this.tiles[y][x].pathPlayerValue = max;
-     }
-   }
-   //let time2 = new Date();
-   //console.log(time2 - time1);
-   let changed;
-   let min, curTile, neighbour;
+    const max = this.parameters.maxMonsterPath;
+    //let time1 = new Date();
+    for (let y = 0; y < this.tiles.length; y++) {
+      for (let x = 0; x < this.tiles[0].length; x++) {
+        if (this.player.pos.y === y && this.player.pos.x === x) {
+          // Goal position, guide toward player
+          this.tiles[y][x].pathPlayerValue = 0;
+          continue;
+        }
+        this.tiles[y][x].pathPlayerValue = max;
+      }
+    }
+    //let time2 = new Date();
+    //console.log(time2 - time1);
+    let changed;
+    let min, curTile, neighbour;
 
-   do {
-     changed = false;
+    do {
+      changed = false;
 
-     for (curTile of this.floorMap) {
-       min = max;
-       //let curTile = this.tiles[curPos.y][curPos.x];
+      for (curTile of this.floorMap) {
+        min = max;
+        //let curTile = this.tiles[curPos.y][curPos.x];
 
-       for (neighbour of curTile.neighbours) {
-         if (min > neighbour.pathPlayerValue) {
-           min = neighbour.pathPlayerValue;
-         }
-       }
+        for (neighbour of curTile.neighbours) {
+          if (min > neighbour.pathPlayerValue) {
+            min = neighbour.pathPlayerValue;
+          }
+        }
 
-       min += 1;
-       if (curTile.pathPlayerValue > min) {
-         curTile.pathPlayerValue = min;
-         changed = true;
-       }
+        min += 1;
+        if (curTile.pathPlayerValue > min) {
+          curTile.pathPlayerValue = min;
+          changed = true;
+        }
 
-     }
+      }
 
-   } while (changed)
+    } while (changed)
   }
 
   getNeighbourTiles(pos) {
@@ -286,7 +286,7 @@ class Game {
     this.tui.disableKeys();
     clearInterval(this.monsterInterval);
     let msg = "Game over!";
-    this.tui.popupMessage(msg, function() {
+    this.tui.popupMessage(msg, function () {
       process.exit(0);
     })
   }
@@ -436,48 +436,57 @@ class Game {
   startProcessingMonsters() {
     let game = this;
     this.monsterInterval = setInterval(function () {
+      monsterLoop:
       for (let monster of game.monsters) {
+        // process movement x speed / tick
         for (let i = 0; i <= monster.speed; i++) {
-        let origPos = monster.pos.clone();
-        let origTile = game.tiles[monster.pos.y][monster.pos.x];
-        if (!origTile.explored && !monster.active) {
-          // only process monsters the player has seen or that are active
-          continue;
-        }
-
-        monster.active = true;
-        let neighbours = origTile.neighbours;
-        let target = false;
-
-        for (let neighbour of neighbours) {
-          // "roll downhill"
-          if (!target || target.pathPlayerValue > neighbour.pathPlayerValue) {
-            target = neighbour;
+          let origPos = monster.pos.clone();
+          let origTile = game.tiles[monster.pos.y][monster.pos.x];
+          if (!origTile.explored && !monster.active) {
+            // only process monsters the player has seen or that are active
+            continue;
           }
+
+          monster.active = true;
+          let neighbours = origTile.neighbours;
+          let target = false;
+
+          for (let neighbour of neighbours) {
+            // "roll downhill"
+            if (!target || target.pathPlayerValue > neighbour.pathPlayerValue) {
+              target = neighbour;
+            }
+          }
+
+          //Attack if next to player
+          if (game.player.pos.equal(target.pos)) {
+            game.player.health -= monster.damage;
+            game.tui.setHealth(game.player.health);
+            if (game.player.health <= 0) {
+              game.gameOverMessage();
+            }
+            continue monsterLoop;
+          }
+
+          monster.pos = target.pos;
+
+          if (target.pathPlayerValue == game.parameters.maxMonsterPath || game.player.pos.equal(monster.pos) || game.tiles.length <= monster.pos.y || game.tiles[0].length <= monster.pos.x ||
+            game.tiles[monster.pos.y][monster.pos.x].impassable) {
+            monster.pos = origPos;
+            continue
+          }
+
+          origTile.monster = undefined;
+          origTile.impassable = false;
+
+          game.tiles[monster.pos.y][monster.pos.x].monster = monster;
+          game.tiles[monster.pos.y][monster.pos.x].impassable = true;
         }
-
-        if (game.player.pos.equal(target.pos)) {
-          // Monster is next to player, attack
-          game.player.health -= monster.damage;
-          continue;
-        }
-
-        monster.pos = target.pos;
-
-        if (target.pathPlayerValue == game.parameters.maxMonsterPath || game.player.pos.equal(monster.pos) || game.tiles.length <= monster.pos.y || game.tiles[0].length <= monster.pos.x ||
-          game.tiles[monster.pos.y][monster.pos.x].impassable) {
-          monster.pos = origPos;
-          continue
-        }
-
-        origTile.monster = undefined;
-        origTile.impassable = false;
-
-        game.tiles[monster.pos.y][monster.pos.x].monster = monster;
-        game.tiles[monster.pos.y][monster.pos.x].impassable = true;
-      }
         // game.tiles[monster.pos.y][monster.pos.x].monster = monster;
       }
+
+
+
       game.refreshScreen();
 
     }, game.parameters.monsterInterval);
@@ -494,19 +503,14 @@ class Game {
     this.setupMap();
     this.refreshPlayerPath();
     this.setupMonsters();
-    
-    let game = this;
-    this.welcomeMessage(function() {
-      
-      game.setEventHandler();
-     game.startProcessingMonsters();
-     game.refreshScreen();
-      
-    }); // welcome message triggers initial screen rendering in callback
-    
-  
 
-    this.tui.setHealth(50);
+    let game = this;
+    this.welcomeMessage(function () {
+      game.setEventHandler();
+      game.startProcessingMonsters();
+      game.refreshScreen();
+    }); // welcome message triggers initial screen rendering in callback
+
   }
 
 }

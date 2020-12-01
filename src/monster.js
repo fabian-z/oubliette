@@ -17,12 +17,12 @@ export class Monster {
 
 let types = [
     {name: 'Orc', symbol: "O", damage: 5, speed: 1},
-    {name: 'Bat', symbol: "B", damage: 1, speed: 2},
+    {name: 'Bat', symbol: "B", damage: 1, speed: 1},
     {name: 'Rat', symbol: "R", damage: 2, speed: 1},
     {name: 'Undead', symbol: "U", damage: 5, speed: 1},
     {name: 'Troll', symbol: "T", damage: 5, speed: 1},
     {name: 'Warg', symbol: "W", damage: 3, speed: 1},
-    {name: 'Spider', symbol: "S", damage: 1, speed: 2}
+    {name: 'Spider', symbol: "S", damage: 1, speed: 1}
 ];
 
 export function getRandomType() {
