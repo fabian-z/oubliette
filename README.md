@@ -33,7 +33,7 @@ Project work for lecture Programming I
 * Good monster pathfinding ☑
   * Uses Dijkstra map, a simplified algorithm where all edges have identical weight
   * Pathfinding is executed on a separate worker thread
-
+* Battle system (Different damage values, player <-> monster)
 * Saving of application state / game player progress 
   * -> Save level map but keep permadeath?
 * Research of UX with different algorithm parameters (map generation, distribution rules)

@@ -2,7 +2,7 @@ import { TerminalInterface } from './tui.js';
 import { Dungeon } from './dungeon.js';
 import { getRandomInt, Vector2 } from './util.js';
 import { Monster, generateRandomMonster } from './monster.js';
-import { Worker, isMainThread }  from 'worker_threads';
+import { Worker, isMainThread } from 'worker_threads';
 
 class Tile {
   isWall;
@@ -90,6 +90,7 @@ class Game {
     renderScaling: 4,
     baseExploreRadius: 3,
     initalExploreFactor: 2,
+    enableExploration: true,
     playerSpeed: 1,
     maxMonsterPath: 99, // careful with performance!
     monsterInterval: 1000,
@@ -101,7 +102,7 @@ class Game {
   pathWorkerDroppedRequest = false;
   pathWorkerDataChanged = false;
   pathWorkerData = ""; // JSON encoded to avoid serialiation overhead after starting the game
-  
+
   movePlayer(pos) {
     //move, set explored tiles, then regenerate Dijkstra map
 
@@ -145,7 +146,7 @@ class Game {
   // This allows for larger maximum paths and should eliminate FPS drops
   setupPathWorker() {
     if (isMainThread) {
-      
+
       this.pathWorker = new Worker(new URL('./pathWorker.js', import.meta.url));
 
       this.pathWorker.on('message', (data) => {
@@ -157,7 +158,7 @@ class Game {
             this.tiles[y][x].pathPlayerValue = data[y][x];
           }
         }
-   
+
         if (this.pathWorkerDroppedRequest) {
           // execute dropped request after finishing
           this.pathWorkerDroppedRequest = false;
@@ -195,7 +196,7 @@ class Game {
     }
 
     // transfer player position for generating updated Dijkstra map
-    this.pathWorker.postMessage({pos: [this.player.pos.x, this.player.pos.y]});
+    this.pathWorker.postMessage({ pos: [this.player.pos.x, this.player.pos.y] });
   }
 
   getNeighbourTiles(pos) {
@@ -348,12 +349,15 @@ class Game {
         for (let i = 0; i < this.parameters.renderScaling; i++) {
           let tile = new Tile();
 
-          if (Math.abs(x - this.dungeon.playerStart.x) <= initialExploreRadius &&
-            Math.abs(y - this.dungeon.playerStart.y) <= initialExploreRadius) {
+          if (this.parameters.enableExploration) {
+            if (Math.abs(x - this.dungeon.playerStart.x) <= initialExploreRadius &&
+              Math.abs(y - this.dungeon.playerStart.y) <= initialExploreRadius) {
+              tile.explored = true;
+            }
+          } else {
             tile.explored = true;
           }
 
-          //tile.explored = true
           if (this.dungeon.isWall(curPos)) {
             tile.isWall = true;
             tile.impassable = true;
@@ -368,8 +372,6 @@ class Game {
           }
 
           row.push(tile);
-
-          //row.push(dungeon.walls.get([x, y]) ? tui.preRender.wall : tui.preRender.corridor);
         }
       }
 
@@ -409,7 +411,7 @@ class Game {
     }
 
     this.pathWorkerDataChanged = true;
-    this.pathWorkerData = JSON.stringify({max: this.parameters.maxMonsterPath, tiles: workerTiles, floor: floorMap});
+    this.pathWorkerData = JSON.stringify({ max: this.parameters.maxMonsterPath, tiles: workerTiles, floor: floorMap });
   }
 
   setupMonsters() {
