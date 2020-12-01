@@ -17,13 +17,13 @@ if (!isMainThread) {
                 break;
         }
 
-        if (obj.hasOwnProperty("max")) {
+        if (Object.prototype.hasOwnProperty.call(obj, "max")) {
             // Store base data
             baseData = obj;
             return;
         }
 
-        if (obj.hasOwnProperty("pos")) {
+        if (Object.prototype.hasOwnProperty.call(obj, "pos")) {
             // Received player position, map calculation requested
             playerPos = data.pos;
         }
@@ -35,7 +35,6 @@ if (!isMainThread) {
         let changed;
         let min, curPos, neighbour;
 
-
         /* From http://www.roguebasin.com/index.php?title=The_Incredible_Power_of_Dijkstra_Maps
         To get a Dijkstra map, you start with an integer array representing your map, with some set of goal cells set to zero
         and all the rest set to a very high number. Iterate through the map's "floor" cells -- skip the impassable wall cells.
@@ -45,17 +44,18 @@ if (!isMainThread) {
         The resulting grid of numbers represents the number of steps that it will take to get from any given tile to the nearest goal.
         */
 
+        // Note: Position values are [x, y] in the worker, because Vector2 causes serialization overhead
+        // This could be fixed with a more sophisticated serialization, e.g. FlatBuffers
+
+        // Preparation
         for (let y = 0; y < tiles.length; y++) {
             for (let x = 0; x < tiles[0].length; x++) {
                 tiles[y][x].val = max;
             }
-        }
-
-        // Note: Position values are [x, y] in the worker, because Vector2 causes serialization overhead
-        // This could be fixed with a more sophisticated serialization, e.g. FlatBuffers
-
+        }    
         tiles[playerPos[1]][playerPos[0]].val = 0;
 
+        // Actual path calculation
         do {
             changed = false;
             for (curPos of floor) {
