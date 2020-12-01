@@ -289,12 +289,13 @@ class Game {
   gameOverMessage() {
     this.tui.disableKeys();
     clearInterval(this.monsterInterval);
-    this.tui.setMainContent(" ");
+    // TODO clearing main view not working here?
+
     let msg = "Game over!";
     let game = this;
     this.tui.popupMessage(msg, 3, function () {
       game.tui.quit();
-    })
+    });
   }
 
   setEventHandler() {
@@ -302,7 +303,7 @@ class Game {
     // refresh render on screen resize
     this.tui.onScreenResize(function () {
       game.refreshScreen();
-    })
+    });
 
     // react to user input with WASD / arrow keys, move player only for now
     this.tui.onKeypress(function (ch, key) {
@@ -438,8 +439,8 @@ class Game {
           continue;
         }
 
-        if (curTile.roomTag == "initial" || curTile.isCorridor) {
-          continue
+        if (curTile.roomTag === "initial" || curTile.isCorridor) {
+          continue;
         }
 
         // TODO check for other monsters, items
@@ -490,10 +491,10 @@ class Game {
 
           monster.pos = target.pos;
 
-          if (target.pathPlayerValue == game.parameters.maxMonsterPath || game.player.pos.equal(monster.pos) || game.tiles.length <= monster.pos.y || game.tiles[0].length <= monster.pos.x ||
+          if (target.pathPlayerValue === game.parameters.maxMonsterPath || game.player.pos.equal(monster.pos) || game.tiles.length <= monster.pos.y || game.tiles[0].length <= monster.pos.x ||
             game.tiles[monster.pos.y][monster.pos.x].impassable) {
             monster.pos = origPos;
-            continue
+            continue;
           }
 
           origTile.monster = undefined;

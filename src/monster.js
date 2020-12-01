@@ -43,7 +43,7 @@ export function generateRandomMonster() {
     monster.xp = getRandomInt(1, 10);
 
     // TODO generate loot
-    return monster
+    return monster;
 }
 
 

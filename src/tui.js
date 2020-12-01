@@ -1,5 +1,5 @@
 import blessed from 'blessed';
-import { Vector2 } from './util.js'
+import { Vector2 } from './util.js';
 
 export class TerminalInterface {
 
@@ -71,7 +71,7 @@ export class TerminalInterface {
         });
         this.mainView.append(messageBox);
         messageBox.display(msg, time, function() {
-            if (callback != undefined) {
+            if (callback !== undefined) {
                 callback();
             }
         });

@@ -10,5 +10,15 @@
         "sourceType": "module"
     },
     "rules": {
+        "eqeqeq": "error",
+        "semi": "error",
+        "curly": "error",
+        "no-alert": "error",
+        "no-implicit-coercion": "error",
+        "no-invalid-this": "error",
+        "no-return-assign": "error",
+        "no-unused-expressions": "error", 
+        "dot-notation": "warn",
+        "yoda": "warn"
     }
 }

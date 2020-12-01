@@ -79,7 +79,7 @@ if (!isMainThread) {
                 }
             }
 
-        } while (changed)
+        } while (changed);
 
         // Reduce result and transfer only map values in 2d array
         // This saves time in parsing on the main thread

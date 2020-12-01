@@ -1,4 +1,4 @@
-import { getRandomInt } from './util.js'
+import { getRandomInt } from './util.js';
 
 // Names generated with https://www.vulgarlang.com v10
 // Associated language is called Grearian, see res/lang
@@ -5008,7 +5008,7 @@ let generatedNames = [
 ];
 
 export function getRandomName() {
-    if (generatedNames.length == 0) {
+    if (generatedNames.length === 0) {
         generatedNames = usedNames;
         usedNames = [];
     }
