@@ -278,16 +278,17 @@ class Game {
   welcomeMessage(callback) {
     // welcome message
     let msg = "You awaken in a dark dungeon and can only see a faint light from an opening at the top - defeat all monsters to survive.";
-    let game = this;
-    this.tui.popupMessage(msg, callback);
+    this.tui.popupMessage(msg, 0, callback);
   }
 
   gameOverMessage() {
     this.tui.disableKeys();
     clearInterval(this.monsterInterval);
+    this.tui.setMainContent(" ");
     let msg = "Game over!";
-    this.tui.popupMessage(msg, function () {
-      process.exit(0);
+    let game = this;
+    this.tui.popupMessage(msg, 3, function () {
+      game.tui.quit();
     })
   }
 

@@ -40,7 +40,7 @@ export class TerminalInterface {
     }
 
     disableKeys() {
-        this.screen.disableKeys();
+        this.screen.lockKeys = true;
     }
 
     debug(...msg) {
@@ -49,7 +49,7 @@ export class TerminalInterface {
         }
     }
 
-    popupMessage(msg, callback) {
+    popupMessage(msg, time, callback) {
         let messageBox = blessed.message({
             parent: this.screen,
             width: "50%",
@@ -70,11 +70,16 @@ export class TerminalInterface {
 
         });
         this.mainView.append(messageBox);
-        messageBox.display(msg, 0, function() {
+        messageBox.display(msg, time, function() {
             if (callback != undefined) {
                 callback();
             }
         });
+    }
+
+    quit() {
+        this.screen.destroy();
+        process.exit(0);
     }
 
     constructor() {
