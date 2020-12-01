@@ -2,6 +2,7 @@ import { TerminalInterface } from './tui.js';
 import { Dungeon } from './dungeon.js';
 import { getRandomInt, Vector2 } from './util.js';
 import { Monster, generateRandomMonster } from './monster.js';
+import { Worker, isMainThread }  from 'worker_threads';
 
 class Tile {
   isWall;
@@ -76,7 +77,6 @@ class Player {
 
 class Game {
   tiles = []; // [y][x] 2d array
-  floorMap = []; // array with floor tiles, used to speed up pathfinding
   monsters = [];
   items = [];
   player;
@@ -91,13 +91,19 @@ class Game {
     baseExploreRadius: 3,
     initalExploreFactor: 2,
     playerSpeed: 1,
-    maxMonsterPath: 50, // careful with performance!
+    maxMonsterPath: 99, // careful with performance!
     monsterInterval: 1000,
     monsterCount: 20
   }
 
+
+  pathWorkerRunning = false;
+  pathWorkerDroppedRequest = false;
+  pathWorkerDataChanged = false;
+  pathWorkerData = ""; // JSON encoded to avoid serialiation overhead after starting the game
+  
   movePlayer(pos) {
-    //move, then regenerate Dijkstra map
+    //move, set explored tiles, then regenerate Dijkstra map
 
     // Actual movement, rollback if obstruction exists
     let origPos = this.player.pos.clone();
@@ -131,66 +137,65 @@ class Game {
 
     this.refreshPlayerPath();
 
-    //let time3 = new Date() - time2;
-    //console.log(time3);
-    //process.exit(1);
-
     return true;
 
   }
 
-  refreshPlayerPath() {
-    // Refresh Dijkstra map values
+  // pathWorker calculates Dijkstra map values on another thread, separate from main UI thread
+  // This allows for larger maximum paths and should eliminate FPS drops
+  setupPathWorker() {
+    if (isMainThread) {
+      
+      this.pathWorker = new Worker(new URL('./pathWorker.js', import.meta.url));
 
-    /* From http://www.roguebasin.com/index.php?title=The_Incredible_Power_of_Dijkstra_Maps
-    To get a Dijkstra map, you start with an integer array representing your map, with some set of goal cells set to zero
-    and all the rest set to a very high number. Iterate through the map's "floor" cells -- skip the impassable wall cells.
-    If any floor tile has a value greater than 1 regarding to its lowest-value floor neighbour
-    (in a cardinal direction - i.e. up, down, left or right; a cell next to the one we are checking),
-    set it to be exactly 1 greater than its lowest value neighbor. Repeat until no changes are made.
-    The resulting grid of numbers represents the number of steps that it will take to get from any given tile to the nearest goal.
-    */
+      this.pathWorker.on('message', (data) => {
+        this.pathWorkerRunning = false;
 
-
-    const max = this.parameters.maxMonsterPath;
-    //let time1 = new Date();
-    for (let y = 0; y < this.tiles.length; y++) {
-      for (let x = 0; x < this.tiles[0].length; x++) {
-        if (this.player.pos.y === y && this.player.pos.x === x) {
-          // Goal position, guide toward player
-          this.tiles[y][x].pathPlayerValue = 0;
-          continue;
-        }
-        this.tiles[y][x].pathPlayerValue = max;
-      }
-    }
-    //let time2 = new Date();
-    //console.log(time2 - time1);
-    let changed;
-    let min, curTile, neighbour;
-
-    do {
-      changed = false;
-
-      for (curTile of this.floorMap) {
-        min = max;
-        //let curTile = this.tiles[curPos.y][curPos.x];
-
-        for (neighbour of curTile.neighbours) {
-          if (min > neighbour.pathPlayerValue) {
-            min = neighbour.pathPlayerValue;
+        //read Dijkstra map values from pathWorker
+        for (let y = 0; y < this.tiles.length; y++) {
+          for (let x = 0; x < this.tiles[0].length; x++) {
+            this.tiles[y][x].pathPlayerValue = data[y][x];
           }
         }
-
-        min += 1;
-        if (curTile.pathPlayerValue > min) {
-          curTile.pathPlayerValue = min;
-          changed = true;
+   
+        if (this.pathWorkerDroppedRequest) {
+          // execute dropped request after finishing
+          this.pathWorkerDroppedRequest = false;
+          this.refreshPlayerPath();
         }
+      });
 
-      }
+      this.pathWorker.on('error', (error) => {
+        // Logging error caused by worker thread
+        throw new Error(error.message);
+      });
 
-    } while (changed)
+      this.pathWorker.on('exit', (code) => {
+        if (code !== 0) {
+          throw new Error(`Worker stopped with exit code ${code}`);
+        }
+      });
+
+    }
+  }
+
+  refreshPlayerPath() {
+    // Refresh Dijkstra map values with player as goal, see pathWorker.js
+
+    if (this.pathWorkerRunning) {
+      this.pathWorkerDroppedRequest = true;
+      return;
+    }
+
+    this.pathWorkerRunning = true;
+    if (this.pathWorkerDataChanged) {
+      // only transfer large base information when needed
+      this.pathWorker.postMessage(this.pathWorkerData);
+      this.pathWorkerJSONChanged = false;
+    }
+
+    // transfer player position for generating updated Dijkstra map
+    this.pathWorker.postMessage({pos: [this.player.pos.x, this.player.pos.y]});
   }
 
   getNeighbourTiles(pos) {
@@ -276,7 +281,6 @@ class Game {
   }
 
   welcomeMessage(callback) {
-    // welcome message
     let msg = "You awaken in a dark dungeon and can only see a faint light from an opening at the top - defeat all monsters to survive.";
     this.tui.popupMessage(msg, 0, callback);
   }
@@ -378,21 +382,34 @@ class Game {
       }
     }
 
-    // post-process map tiles to fill position, neighbours and floorMap
+    let workerTiles = [];
+    let floorMap = [];
+
+    // post-process map tiles to fill position, neighbours and provide serialized information for pathWorker
     for (let y = 0; y < this.tiles.length; y++) {
+      let workerRow = [];
       for (let x = 0; x < this.tiles[0].length; x++) {
         let curTile = this.tiles[y][x];
         let curVec = new Vector2(x, y);
+
+        let workerTile = {};
+        workerTile.n = []; // neighbours, shorten to reduce JSON length
+
         curTile.pos = curVec;
         if (!curTile.isWall) {
-          this.floorMap.push(curTile);
+          floorMap.push([x, y]);
         }
         for (let neighbourPos of this.getNeighbourTiles(curVec)) {
+          workerTile.n.push([neighbourPos.x, neighbourPos.y]);
           curTile.neighbours.push(this.tiles[neighbourPos.y][neighbourPos.x]);
         }
+        workerRow.push(workerTile);
       }
+      workerTiles.push(workerRow);
     }
 
+    this.pathWorkerDataChanged = true;
+    this.pathWorkerData = JSON.stringify({max: this.parameters.maxMonsterPath, tiles: workerTiles, floor: floorMap});
   }
 
   setupMonsters() {
@@ -502,6 +519,7 @@ class Game {
     this.player = new Player("Jenny", this.dungeon.playerStart.scalar(this.parameters.renderScaling).floor());
 
     this.setupMap();
+    this.setupPathWorker();
     this.refreshPlayerPath();
     this.setupMonsters();
 
