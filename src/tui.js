@@ -57,12 +57,12 @@ export class TerminalInterface {
             left: "center",
             top: "center",
             border: {
-                type: 'line'
+                type: 'line',
             },
             style: {
                 fg: 'white',
                 border: {
-                    fg: '#f0f0f0'
+                    fg: '#f0f0f0',
                 },
             },
             align: "center",
@@ -91,7 +91,7 @@ export class TerminalInterface {
             //autoPadding: true,
             debug: true,
             enableKeys: true,
-            title: 'oubliette'
+            title: 'oubliette',
         });
 
         // Create main game viewport
@@ -104,16 +104,16 @@ export class TerminalInterface {
             content: '',
             tags: false,
             border: {
-                type: 'line'
+                type: 'line',
             },
             style: {
                 fg: 'white',
                 border: {
-                    fg: '#f0f0f0'
+                    fg: '#f0f0f0',
                 },
                 hover: {
-                }
-            }
+                },
+            },
         });
 
         // Append our box to the screen.
@@ -129,18 +129,18 @@ export class TerminalInterface {
             content: 'Sidebar',
             tags: true,
             border: {
-                type: 'line'
+                type: 'line',
             },
             style: {
                 fg: 'white',
                 //bg: 'magenta',
                 border: {
-                    fg: '#f0f0f0'
+                    fg: '#f0f0f0',
                 },
                 hover: {
                     //bg: 'green'
-                }
-            }
+                },
+            },
         });
 
         // Append our box to the screen.
@@ -151,7 +151,7 @@ export class TerminalInterface {
             parent: this.screen,
             width: '50%',
             height: "10%",
-            content: "Player: Jenny\n\n\n\n"
+            content: "Player: Jenny\n\n\n\n",
         });
 
         let label = blessed.box({
@@ -159,7 +159,7 @@ export class TerminalInterface {
             top: 5,
             width: '50%',
             height: "10%",
-            content: "HP"
+            content: "HP",
         });
         
         this.healthGauge = blessed.progressbar({
@@ -170,19 +170,19 @@ export class TerminalInterface {
                 bg: 'default',
                 bar: {
                     bg: 'default',
-                    fg: 'red'
+                    fg: 'red',
                 },
                 border: {
                     fg: 'default',
-                    bg: 'default'
-                }
+                    bg: 'default',
+                },
             },
             ch: '█',
             width: '80%',
             height: 3,
             top: 6,
             //left: 3,
-            filled: 0
+            filled: 0,
         });
 
         this.rightView.append(this.playerName);

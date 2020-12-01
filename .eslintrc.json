@@ -17,7 +17,8 @@
         "no-implicit-coercion": "error",
         "no-invalid-this": "error",
         "no-return-assign": "error",
-        "no-unused-expressions": "error", 
+        "no-unused-expressions": "error",
+        "comma-dangle": ["warn", "always-multiline"],
         "dot-notation": "warn",
         "yoda": "warn"
     }

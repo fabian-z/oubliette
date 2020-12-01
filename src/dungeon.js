@@ -35,8 +35,8 @@ export class Dungeon {
                 any: {
                     min_size: [8, 8],
                     max_size: [10, 10],
-                    max_exits: 4
-                }
+                    max_exits: 4,
+                },
             },
             max_corridor_length: 6,
             min_corridor_length: 2,
@@ -44,7 +44,7 @@ export class Dungeon {
             symmetric_rooms: false, // exits must be in the center of a wall if true
             interconnects: 1, //extra corridors to connect rooms and make circular paths. not 100% guaranteed
             max_interconnect_length: 10,
-            room_count: 20
+            room_count: 20,
         });
         this.generated.generate();
 

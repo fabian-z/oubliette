@@ -5004,7 +5004,7 @@ let generatedNames = [
     "Kicked",
     "Durfevs",
     "Eldined",
-    "Wands"
+    "Wands",
 ];
 
 export function getRandomName() {

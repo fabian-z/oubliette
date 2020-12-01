@@ -94,9 +94,8 @@ class Game {
     playerSpeed: 1,
     maxMonsterPath: 99, // careful with performance!
     monsterInterval: 1000,
-    monsterCount: 20
+    monsterCount: 20,
   }
-
 
   pathWorkerRunning = false;
   pathWorkerDroppedRequest = false;
