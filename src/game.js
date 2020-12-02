@@ -172,9 +172,8 @@ class Game {
       tile.removeMonster();
 
       // TODO if all monsters are defeated, progress to next level
-      return true;
     }
-    return false;
+    return true;wwwwwwww
   }
 
   // pathWorker calculates Dijkstra map values on another thread, separate from main UI thread
@@ -293,7 +292,9 @@ class Game {
   refreshScreen() {
     let buf = [];
     let x, y = 0;
+    let curTile;
     let viewSizeAvail = this.tui.getMainViewSize().sub(new Vector2(2, 2));
+    let renderedMonsters = [];
 
     let camera = this.getCameraPos(viewSizeAvail);
     for (y = camera.y; y < viewSizeAvail.y + camera.y; y++) {
@@ -306,7 +307,13 @@ class Game {
             continue;
           }
 
-          buf.push(this.tiles[y][x].renderString(this.tui));
+          curTile = this.tiles[y][x];
+
+          if (curTile.monster instanceof Monster && curTile.monster.active) {
+            renderedMonsters.push(curTile.monster);
+          }
+
+          buf.push(curTile.renderString(this.tui));
         } else {
           // Rendering screen larger than map
           buf.push("*");
@@ -317,6 +324,14 @@ class Game {
     }
 
     this.tui.setMainContent(buf.join(""));
+
+    let monsterBuf = [];
+    let monster;
+    for (monster of renderedMonsters) {
+      monsterBuf.push(`${this.tui.preRender.monsterPrefix}${monster.symbol}${this.tui.preRender.monsterSuffix} - ${monster.name} (${monster.type}) - HP: ${monster.health}\n`);
+    }
+
+    this.tui.setMonsterList(monsterBuf.join(""));
   }
 
   welcomeMessage(callback) {
@@ -567,24 +582,28 @@ class Game {
   }
 
   constructor() {
+    // setup dependency classes
     this.tui = new TerminalInterface();
     this.dungeon = new Dungeon();
 
+    // calculate game parameters
     this.parameters.scaledExploreRadius = this.parameters.renderScaling * this.parameters.baseExploreRadius;
 
     this.player = new Player("Jenny", this.dungeon.playerStart.scalar(this.parameters.renderScaling).floor());
 
+    // initialize and prepare game routines
     this.setupMap();
     this.setupPathWorker();
     this.refreshPlayerPath();
     this.setupMonsters();
 
     let game = this;
+    // welcome message triggers initial screen rendering in callback and starts the game
     this.welcomeMessage(function () {
       game.setEventHandler();
       game.startProcessingMonsters();
       game.refreshScreen();
-    }); // welcome message triggers initial screen rendering in callback
+    });
 
   }
 
