@@ -173,7 +173,7 @@ class Game {
 
       // TODO if all monsters are defeated, progress to next level
     }
-    return true;wwwwwwww
+    return true;
   }
 
   // pathWorker calculates Dijkstra map values on another thread, separate from main UI thread
