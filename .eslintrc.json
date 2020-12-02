@@ -18,6 +18,7 @@
         "no-invalid-this": "error",
         "no-return-assign": "error",
         "no-unused-expressions": "error",
+        "brace-style": "warn",
         "comma-dangle": ["warn", "always-multiline"],
         "dot-notation": "warn",
         "yoda": "warn"
