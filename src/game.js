@@ -16,11 +16,19 @@ class Tile {
 
   impassable;
   explored;
-  hasPlayer;
 
   item;
   monster;
-  monsterInterval;
+
+  addMonster(monster) {
+    this.monster = monster;
+    this.impassable = true;
+  }
+
+  removeMonster() {
+    this.monster = undefined;
+    this.impassable = false;
+  }
 
   clone() {
     // custom clone function
@@ -33,16 +41,12 @@ class Tile {
 
     tile.impassable = this.impassable;
     tile.explored = this.explored;
-    tile.hasPlayer = this.hasPlayer;
     tile.item = this.item;
     tile.monster = this.monster;
     return tile;
   }
 
   renderString(tui) {
-    if (this.hasPlayer) {
-      return tui.preRender.player;
-    }
     if (!this.explored) {
       return " ";
     }
@@ -92,15 +96,28 @@ class Game {
     initalExploreFactor: 2,
     enableExploration: true,
     playerSpeed: 1,
-    maxMonsterPath: 99, // careful with performance!
+    maxMonsterPath: 999, // careful with performance!
     monsterInterval: 1000,
     monsterCount: 20,
+    playerBaseDamage: 5,
   }
 
   pathWorkerRunning = false;
   pathWorkerDroppedRequest = false;
   pathWorkerDataChanged = false;
   pathWorkerData = ""; // JSON encoded to avoid serialiation overhead after starting the game
+
+  addMonster(monster) {
+    this.monsters.push(monster);
+  }
+
+  removeMonster(monster) {
+    let index = this.monsters.indexOf(monster);
+    let removed = this.monsters.splice(index, 1);
+    if (removed.length !== 1) {
+      throw new Error("monster array not in sync during removal");
+    }
+  }
 
   movePlayer(pos) {
     //move, set explored tiles, then regenerate Dijkstra map
@@ -135,10 +152,29 @@ class Game {
       }
     }
 
+    // Trigger request to update pathfinding to worker
     this.refreshPlayerPath();
 
     return true;
 
+  }
+
+  attackMonster(pos) {
+    // check for monster on defined position
+    let tile = this.tiles[pos.y][pos.x];
+    if (!(tile.monster instanceof Monster)) {
+      // no monster there, nothing to do
+      return false;
+    }
+    tile.monster.health -= this.parameters.playerBaseDamage; // TODO define damage done by player
+    if (tile.monster.health <= 0) {
+      this.removeMonster(tile.monster);
+      tile.removeMonster();
+
+      // TODO if all monsters are defeated, progress to next level
+      return true;
+    }
+    return false;
   }
 
   // pathWorker calculates Dijkstra map values on another thread, separate from main UI thread
@@ -157,6 +193,8 @@ class Game {
             this.tiles[y][x].pathPlayerValue = data[y][x];
           }
         }
+
+        this.tui.debug("Worker took:", new Date() - this.workerStartTime);
 
         if (this.pathWorkerDroppedRequest) {
           // execute dropped request after finishing
@@ -195,6 +233,7 @@ class Game {
     }
 
     // transfer player position for generating updated Dijkstra map
+    this.workerStartTime = new Date();
     this.pathWorker.postMessage({ pos: [this.player.pos.x, this.player.pos.y] });
   }
 
@@ -308,23 +347,37 @@ class Game {
     this.tui.onKeypress(function (ch, key) {
 
       let pos = game.player.pos.clone();
+
+      let offset = game.parameters.playerSpeed;
+      if (key.meta) {
+        // can only attack monsters directly next to player
+        offset = 1;
+      }
+
       switch (key.name) {
         case "w":
         case "up":
-          pos.y -= game.parameters.playerSpeed;
+          pos.y -= offset;
           break;
         case "a":
         case "left":
-          pos.x -= game.parameters.playerSpeed;
+          pos.x -= offset;
           break;
         case "s":
         case "down":
-          pos.y += game.parameters.playerSpeed;
+          pos.y += offset;
           break;
         case "d":
         case "right":
-          pos.x += game.parameters.playerSpeed;
+          pos.x += offset;
           break;
+      }
+
+      if (key.meta) {
+        if (game.attackMonster(pos)) {
+          game.refreshScreen();
+        }
+        return;
       }
 
       if (game.movePlayer(pos)) {
@@ -332,6 +385,7 @@ class Game {
         game.refreshScreen();
         let time2 = new Date();
         game.tui.debug(time2 - time1);
+        return;
       }
 
     });
