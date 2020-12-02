@@ -25,21 +25,25 @@ Project work for lecture Programming I
   * Track player status (health points ☑, experience, character name)
 * Controlled with keyboard ☑
   * Arrow keys, WASD ☑
-* Split-screen with player and game status
+* Split-screen with player and game status ☑
 
 # Nice to have
 
 * Map exploration ☑
 * Good monster pathfinding ☑
   * Uses Dijkstra map, a simplified algorithm where all edges have identical weight
-  * Pathfinding is executed on a separate worker thread
-* Battle system (Different damage values, player <-> monster)
-* Saving of application state / game player progress 
-  * -> Save level map but keep permadeath?
-* Research of UX with different algorithm parameters (map generation, distribution rules)
-* Event logs
-* Different weapons?
-* Easter egg / achievements?
+  * Pathfinding is executed on a separate worker thread ☑
+* Battle system player <-> monster ☑
+  * Research different damage / health parameters
+* Level and character progression
 * Difficulty selection
   * Hard, Medium, Easy - with different game balancing
 * Help screen / signs and symbols explanation for improved UX
+* Event logs
+
+* Saving of application state / game player progress 
+  * -> Save level map but keep permadeath?
+* Research of UX with different algorithm parameters (map generation, distribution rules)
+
+* Different weapons?
+* Easter egg / achievements?
