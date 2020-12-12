@@ -52,7 +52,7 @@ if (!isMainThread) {
             for (let x = 0; x < tiles[0].length; x++) {
                 tiles[y][x].val = max;
             }
-        }    
+        }
         tiles[playerPos[1]][playerPos[0]].val = 0;
 
         // Actual path calculation

@@ -5012,7 +5012,7 @@ export function getRandomName() {
         generatedNames = usedNames;
         usedNames = [];
     }
-    
+
     let i = getRandomInt(0, generatedNames.length);
 
     let name = generatedNames.splice(i, 1)[0];

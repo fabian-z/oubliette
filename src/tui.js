@@ -7,7 +7,7 @@ export class TerminalInterface {
     mainView;
     rightView;
     preRender = {};
-    
+
     // sidebar
     playerName;
     healthGauge;
@@ -117,8 +117,7 @@ export class TerminalInterface {
                 border: {
                     fg: '#f0f0f0',
                 },
-                hover: {
-                },
+                hover: {},
             },
         });
 
@@ -167,7 +166,7 @@ export class TerminalInterface {
             height: "10%",
             content: "HP",
         });
-        
+
         this.healthGauge = blessed.progressbar({
             parent: this.screen,
             border: 'line',
@@ -198,7 +197,7 @@ export class TerminalInterface {
             height: "10%",
             content: "",
         });
-        
+
 
         this.rightView.append(this.playerName);
 
@@ -206,12 +205,12 @@ export class TerminalInterface {
         this.rightView.append(this.healthGauge);
 
         this.rightView.append(this.monsterList);
-        
+
         this.healthGauge.setProgress(100);
 
 
         // Quit on Escape, q, or Control-C.
-        this.screen.key(['escape', 'q', 'C-c'], function () {
+        this.screen.key(['escape', 'q', 'C-c'], function() {
             return process.exit(0);
         });
 
