@@ -13,8 +13,8 @@ let types = [{
         game.modifyPlayerHealth(getRandomInt(20, 100));
     },
 }, {
-    name: 'Fastness potion',
-    symbol: "F",
+    name: 'Agility potion',
+    symbol: "A",
     effect: function(game) {
         game.parameters.playerSpeed = 2;
         setTimeout(function() {
@@ -22,8 +22,6 @@ let types = [{
         }, 10 * 1000);
     },
 }];
-
-
 
 export function getRandomType() {
     let i = getRandomInt(0, types.length);

@@ -120,7 +120,7 @@ class Game {
     pathWorkerRunning = false;
     pathWorkerDroppedRequest = false;
     pathWorkerDataChanged = false;
-    pathWorkerData = ""; // JSON encoded to avoid serialiation overhead after starting the game
+    pathWorkerData = ""; // JSON encoded to avoid serialization overhead after starting the game
 
     addMonster(monster) {
         this.monsters.push(monster);
