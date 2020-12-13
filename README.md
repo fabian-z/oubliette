@@ -21,8 +21,8 @@ Project work for lecture Programming I
 * Rouge-like game with monospace ASCII / UTF-8 art interface
   * Procedurally generated maps / dungeons ☑
     * Research algorithms and test JS implementations ☑
-  * Random distribution of monsters ☑ and items
-  * Track player status (health points ☑, experience, character name)
+  * Random distribution of monsters ☑ and items ☑
+  * Track player status (health points ☑, experience, character name ☑)
 * Controlled with keyboard ☑
   * Arrow keys, WASD ☑
 * Split-screen with player and game status ☑
@@ -35,6 +35,7 @@ Project work for lecture Programming I
   * Pathfinding is executed on a separate worker thread ☑
 * Battle system player <-> monster ☑
   * Research different damage / health parameters
+* Item callbacks can effect basically all game state objects ☑  
 * Level and character progression
 * Difficulty selection
   * Hard, Medium, Easy - with different game balancing
