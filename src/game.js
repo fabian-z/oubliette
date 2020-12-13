@@ -103,6 +103,7 @@ class Game {
     // should be class internal as implementation detail, TODO: getter functions
     dungeon;
 
+    defaultParameters;
     parameters = {
         renderScaling: 4,
         baseExploreRadius: 3,
@@ -196,6 +197,9 @@ class Game {
         this.tui.setHealth(this.player.health);
         if (this.player.health <= 0) {
             this.gameOverMessage();
+        }
+        if (this.player.health > 100) {
+            this.player.health = 100;
         }
     }
 
@@ -351,6 +355,7 @@ class Game {
         let curTile;
         let viewSizeAvail = this.tui.getMainViewSize().sub(new Vector2(2, 2));
         let renderedMonsters = [];
+        let renderedItems = [];
 
         let camera = this.getCameraPos(viewSizeAvail);
         for (y = camera.y; y < viewSizeAvail.y + camera.y; y++) {
@@ -369,6 +374,10 @@ class Game {
                         renderedMonsters.push(curTile.monster);
                     }
 
+                    if (curTile.item instanceof Item && curTile.explored) {
+                        renderedItems.push(curTile.item);
+                    }
+
                     buf.push(curTile.renderString(this.tui));
                 } else {
                     // Rendering screen larger than map
@@ -381,13 +390,16 @@ class Game {
 
         this.tui.setMainContent(buf.join(""));
 
-        let monsterBuf = [];
-        let monster;
+        let objectBuf = [];
+        let monster, item;
         for (monster of renderedMonsters) {
-            monsterBuf.push(`${this.tui.preRender.monsterPrefix}${monster.symbol}${this.tui.preRender.monsterSuffix} - ${monster.name} (${monster.type}) - HP: ${monster.health}\n`);
+            objectBuf.push(`${this.tui.preRender.monsterPrefix}${monster.symbol}${this.tui.preRender.monsterSuffix} - ${monster.name} (${monster.type}) - HP: ${monster.health}\n`);
+        }
+        for (item of renderedItems) {
+            objectBuf.push(`${this.tui.preRender.itemPrefix}${item.symbol}${this.tui.preRender.itemSuffix} - ${item.type}\n`);
         }
 
-        this.tui.setMonsterList(monsterBuf.join(""));
+        this.tui.setObjectList(objectBuf.join(""));
     }
 
     welcomeMessage(callback) {
@@ -668,6 +680,7 @@ class Game {
         this.dungeon = new Dungeon();
 
         // calculate game parameters
+        this.defaultParameters = { ...this.parameters };
         this.parameters.scaledExploreRadius = this.parameters.renderScaling * this.parameters.baseExploreRadius;
 
         this.player = new Player("", this.dungeon.playerStart.scalar(this.parameters.renderScaling).floor());

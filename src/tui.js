@@ -12,15 +12,15 @@ export class TerminalInterface {
     playerName;
     healthGauge;
     eventLog;
-    monsterList;
+    objectList;
 
     setMainContent(content) {
         this.mainView.setContent(content);
         this.screen.render();
     }
 
-    setMonsterList(content) {
-        this.monsterList.setContent(content);
+    setObjectList(content) {
+        this.objectList.setContent(content);
         this.screen.render();
     }
 
@@ -259,7 +259,7 @@ export class TerminalInterface {
             filled: 0,
         });
 
-        this.monsterList = blessed.box({
+        this.objectList = blessed.box({
             parent: this.screen,
             top: 15,
             width: '90%',
@@ -267,13 +267,10 @@ export class TerminalInterface {
             content: "",
         });
 
-
         this.rightView.append(this.playerName);
-
         this.rightView.append(label);
         this.rightView.append(this.healthGauge);
-
-        this.rightView.append(this.monsterList);
+        this.rightView.append(this.objectList);
 
         this.healthGauge.setProgress(100);
 
