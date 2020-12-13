@@ -229,7 +229,7 @@ class Game {
         if (this.pathWorkerDataChanged) {
             // only transfer large base information when needed
             this.pathWorker.postMessage(this.pathWorkerData);
-            this.pathWorkerJSONChanged = false;
+            this.pathWorkerDataChanged = false;
         }
 
         // transfer player position for generating updated Dijkstra map
