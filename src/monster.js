@@ -1,7 +1,6 @@
 import { getRandomName } from "./lang.js";
 import { getRandomInt, Vector2 } from './util.js';
 
-// TODO Autonomous movement
 export class Monster {
     name;
     pos = new Vector2(0, 0);

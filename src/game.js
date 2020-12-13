@@ -4,6 +4,7 @@ import { getRandomInt, Vector2 } from './util.js';
 import { Monster, generateRandomMonster } from './monster.js';
 import { Worker, isMainThread } from 'worker_threads';
 import { getRandomName } from "./lang.js";
+import { Item, generateRandomItem } from './item.js';
 
 class Tile {
     isWall;
@@ -31,6 +32,14 @@ class Tile {
         this.impassable = false;
     }
 
+    addItem(item) {
+        this.item = item;
+    }
+
+    removeItem() {
+        this.item = undefined;
+    }
+
     clone() {
         // custom clone function
         // https://stackoverflow.com/questions/57542052/deep-clone-class-instance-javascript
@@ -53,6 +62,9 @@ class Tile {
         }
         if (this.monster instanceof Monster) {
             return tui.preRender.monsterPrefix + this.monster.symbol + tui.preRender.monsterSuffix;
+        }
+        if (this.item instanceof Item) {
+            return tui.preRender.itemPrefix + this.item.symbol + tui.preRender.itemSuffix;
         }
         if (this.isWall) {
             return tui.preRender.wall;
@@ -100,6 +112,7 @@ class Game {
         maxMonsterPath: 999, // careful with performance!
         monsterInterval: 1000,
         monsterCount: 20,
+        itemCount: 20,
         playerBaseDamage: 5,
     }
 
@@ -120,6 +133,18 @@ class Game {
         }
     }
 
+    addItem(item) {
+        this.items.push(item);
+    }
+
+    removeItem(item) {
+        let index = this.items.indexOf(item);
+        let removed = this.items.splice(index, 1);
+        if (removed.length !== 1) {
+            throw new Error("item array not in sync during removal");
+        }
+    }
+
     movePlayer(pos) {
         //move, set explored tiles, then regenerate Dijkstra map
 
@@ -127,9 +152,15 @@ class Game {
         let origPos = this.player.pos.clone();
         this.player.pos = pos;
 
-        if (this.tiles[this.player.pos.y][this.player.pos.x].impassable) {
+        let newTile = this.tiles[this.player.pos.y][this.player.pos.x];
+
+        if (newTile.impassable) {
             this.player.pos = origPos;
             return false;
+        }
+
+        if (newTile.item) {
+            this.applyItem(newTile);
         }
 
         // Exploration
@@ -160,6 +191,14 @@ class Game {
 
     }
 
+    modifyPlayerHealth(mod) {
+        this.player.health += mod;
+        this.tui.setHealth(this.player.health);
+        if (this.player.health <= 0) {
+            this.gameOverMessage();
+        }
+    }
+
     attackMonster(pos) {
         // check for monster on defined position
         let tile = this.tiles[pos.y][pos.x];
@@ -176,6 +215,21 @@ class Game {
         }
         return true;
     }
+
+    applyItem(tile) {
+        if (!(tile.item instanceof Item)) {
+            //no item there, nothing to do
+            this.tui.debug("wrong apply item call");
+            return false;
+        }
+        this.tui.debug("applying effect callback");
+        tile.item.effectCallback(this);
+        this.refreshScreen();
+        this.removeItem(tile.item);
+        tile.removeItem();
+        return true;
+    }
+
 
     // pathWorker calculates Dijkstra map values on another thread, separate from main UI thread
     // This allows for larger maximum paths and should eliminate FPS drops
@@ -485,6 +539,38 @@ class Game {
         this.pathWorkerData = JSON.stringify({ max: this.parameters.maxMonsterPath, tiles: workerTiles, floor: floorMap });
     }
 
+    setupItems() {
+        this.items = [];
+        for (let i = 0; i <= this.parameters.itemCount; i++) {
+            let item = generateRandomItem();
+
+            // Cap random item placement for worst case performance
+            // Also makes the linter happy (constant condition error for while (true))
+            let cap = 0;
+            while (cap < 100) {
+                cap++;
+
+                let targetPos = new Vector2(getRandomInt(0, this.tiles[0].length), getRandomInt(0, this.tiles.length));
+                let curTile = this.tiles[targetPos.y][targetPos.x];
+
+                if (this.player.pos.equal(targetPos)) {
+                    continue;
+                }
+
+                //assume that tiles are already populated
+                if (curTile.isWall || curTile.monster instanceof Monster) {
+                    continue;
+                }
+
+                curTile.item = item;
+                curTile.impassable = false;
+                item.pos = targetPos;
+                break;
+            }
+            this.addItem(item);
+        }
+    }
+
     setupMonsters() {
         this.monsters = [];
 
@@ -520,7 +606,7 @@ class Game {
                 monster.pos = targetPos;
                 break;
             }
-            this.monsters.push(monster);
+            this.addMonster(monster);
         }
     }
 
@@ -550,11 +636,7 @@ class Game {
 
                     //Attack if next to player
                     if (game.player.pos.equal(target.pos)) {
-                        game.player.health -= monster.damage;
-                        game.tui.setHealth(game.player.health);
-                        if (game.player.health <= 0) {
-                            game.gameOverMessage();
-                        }
+                        game.modifyPlayerHealth(-monster.damage);
                         continue monsterLoop;
                     }
 
@@ -574,8 +656,6 @@ class Game {
                 }
                 // game.tiles[monster.pos.y][monster.pos.x].monster = monster;
             }
-
-
 
             game.refreshScreen();
 
@@ -597,6 +677,7 @@ class Game {
         this.setupPathWorker();
         this.refreshPlayerPath();
         this.setupMonsters();
+        this.setupItems();
 
         let game = this;
 
