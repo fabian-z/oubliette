@@ -25,7 +25,10 @@ export class TerminalInterface {
     }
 
     setPlayerName(name) {
-        this.playerName = name;
+        if (!name) {
+            name = "Anonymous";
+        }
+        this.playerName.content = `Player: ${name}`;
     }
 
     setHealth(percent) {
@@ -53,6 +56,77 @@ export class TerminalInterface {
         if (this.screen.debug) {
             this.screen.debug(...msg);
         }
+    }
+
+    prompt(msg, def, callback) {
+
+        // native blessed prompt is buggy and cannot be properly styled
+
+        let promptBox = blessed.box({
+            parent: this.screen,
+            width: "50%",
+            height: "25%",
+            left: "center",
+            top: "center",
+            border: {
+                type: 'line',
+            },
+            style: {
+                fg: 'white',
+                border: {
+                    fg: '#f0f0f0',
+                },
+            },
+            align: "center",
+            valign: "middle",
+        });
+
+        let question = blessed.box({
+            parent: promptBox,
+            width: "50%",
+            height: "60%",
+            left: "center",
+            top: "center",
+            align: "center",
+            valign: "top",
+            content: msg,
+        });
+
+        let entryBox = blessed.box({
+            parent: promptBox,
+            width: "50%",
+            height: "25%",
+            left: "center",
+            top: "center",
+            align: "center",
+            valign: "bottom",
+            border: {
+                type: 'line',
+            },
+        });
+
+        let entry = blessed.textbox({
+            parent: entryBox,
+            width: "90%",
+            height: "70%",
+            // align, position and style options do not work well with textbox and cursors
+            //style: {
+            //    bg: "#000000",
+            //},
+        });
+
+        entryBox.append(entry);
+        promptBox.append(question);
+        promptBox.append(entryBox);
+
+        entry.setValue(def);
+        entry.readInput(function(err, val) {
+            promptBox.destroy();
+            callback(err, val);
+        });
+
+        this.mainView.append(promptBox);
+        this.screen.render();
     }
 
     popupMessage(msg, time, callback) {
@@ -138,12 +212,8 @@ export class TerminalInterface {
             },
             style: {
                 fg: 'white',
-                //bg: 'magenta',
                 border: {
                     fg: '#f0f0f0',
-                },
-                hover: {
-                    //bg: 'green'
                 },
             },
         });
@@ -151,12 +221,11 @@ export class TerminalInterface {
         // Append our box to the screen.
         this.screen.append(this.rightView);
 
-        //let gauge = contrib.gauge({label: 'Progress', stroke: 'green', fill: 'white'});
         this.playerName = blessed.box({
             parent: this.screen,
             width: '50%',
             height: "10%",
-            content: "Player: Jenny\n\n\n\n",
+            content: "Player:",
         });
 
         let label = blessed.box({

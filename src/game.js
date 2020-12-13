@@ -3,6 +3,7 @@ import { Dungeon } from './dungeon.js';
 import { getRandomInt, Vector2 } from './util.js';
 import { Monster, generateRandomMonster } from './monster.js';
 import { Worker, isMainThread } from 'worker_threads';
+import { getRandomName } from "./lang.js";
 
 class Tile {
     isWall;
@@ -589,7 +590,7 @@ class Game {
         // calculate game parameters
         this.parameters.scaledExploreRadius = this.parameters.renderScaling * this.parameters.baseExploreRadius;
 
-        this.player = new Player("Jenny", this.dungeon.playerStart.scalar(this.parameters.renderScaling).floor());
+        this.player = new Player("", this.dungeon.playerStart.scalar(this.parameters.renderScaling).floor());
 
         // initialize and prepare game routines
         this.setupMap();
@@ -598,12 +599,20 @@ class Game {
         this.setupMonsters();
 
         let game = this;
-        // welcome message triggers initial screen rendering in callback and starts the game
-        this.welcomeMessage(function() {
-            game.setEventHandler();
-            game.startProcessingMonsters();
-            game.refreshScreen();
+
+        this.tui.prompt("What is your name?", getRandomName(), function(err, name) {
+            game.tui.debug(name);
+            game.player.name = name;
+            game.tui.setPlayerName(name);
+            // welcome message triggers initial screen rendering in callback and starts the game
+            game.welcomeMessage(function() {
+                game.setEventHandler();
+                game.startProcessingMonsters();
+                game.refreshScreen();
+            });
         });
+
+
 
     }
 
