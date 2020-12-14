@@ -657,6 +657,8 @@ class Game {
     startProcessingMonsters() {
         let game = this;
         this.monsterInterval = setInterval(function() {
+            let processedMonster = false;
+
             monsterLoop: for (let monster of game.monsters) {
                 // process movement x speed / tick
                 for (let i = 0; i <= monster.speed; i++) {
@@ -666,6 +668,7 @@ class Game {
                         // only process monsters the player has seen or that are active
                         continue;
                     }
+                    processedMonster = true;
 
                     monster.active = true;
                     let neighbours = origTile.neighbours;
@@ -701,7 +704,9 @@ class Game {
                 // game.tiles[monster.pos.y][monster.pos.x].monster = monster;
             }
 
-            game.refreshScreen();
+            if (processedMonster) {
+                game.refreshScreen();
+            }
 
         }, game.parameters.monsterInterval);
     }
