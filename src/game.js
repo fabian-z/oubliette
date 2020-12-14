@@ -453,7 +453,7 @@ class Game {
                 game.tui.helpMessage(function() {
                     game.processingUserInput = true;
                     game.startProcessingMonsters();
-                })
+                });
                 return;
             }
 
