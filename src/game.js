@@ -117,6 +117,8 @@ class Game {
         playerBaseDamage: 5,
     }
 
+    processingUserInput = true;
+
     pathWorkerRunning = false;
     pathWorkerDroppedRequest = false;
     pathWorkerDataChanged = false;
@@ -131,6 +133,9 @@ class Game {
         let removed = this.monsters.splice(index, 1);
         if (removed.length !== 1) {
             throw new Error("monster array not in sync during removal");
+        }
+        if (this.monsters.length === 0) {
+            this.gameWonMessage();
         }
     }
 
@@ -214,7 +219,6 @@ class Game {
         if (tile.monster.health <= 0) {
             this.removeMonster(tile.monster);
             tile.removeMonster();
-
             // TODO if all monsters are defeated, progress to next level
         }
         return true;
@@ -419,6 +423,19 @@ class Game {
         });
     }
 
+    gameWonMessage() {
+        // TODO replace with level progression
+        this.tui.disableKeys();
+        this.stopProcessingMonsters();
+        // TODO clearing main view not working here?
+
+        let msg = "Congratulations - you defeated all monsters and can survive!";
+        let game = this;
+        this.tui.popupMessage(msg, 3, function() {
+            game.tui.quit();
+        });
+    }
+
     setEventHandler() {
         let game = this;
         // refresh render on screen resize
@@ -428,6 +445,21 @@ class Game {
 
         // react to user input with WASD / arrow keys, move player only for now
         this.tui.onKeypress(function(ch, key) {
+
+            if (key.name === "h") {
+                game.stopProcessingMonsters();
+                game.processingUserInput = false;
+
+                game.tui.helpMessage(function() {
+                    game.processingUserInput = true;
+                    game.startProcessingMonsters();
+                })
+                return;
+            }
+
+            if (!game.processingUserInput) {
+                return;
+            }
 
             let pos = game.player.pos.clone();
 

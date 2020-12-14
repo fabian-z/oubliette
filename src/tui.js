@@ -95,7 +95,7 @@ export class TerminalInterface {
         let entryBox = blessed.box({
             parent: promptBox,
             width: "50%",
-            height: "25%",
+            height: "30%",
             left: "center",
             top: "center",
             align: "center",
@@ -151,6 +151,37 @@ export class TerminalInterface {
         });
         this.mainView.append(messageBox);
         messageBox.display(msg, time, function() {
+            if (callback !== undefined) {
+                callback();
+            }
+        });
+    }
+
+    helpMessage(callback) {
+        let messageBox = blessed.message({
+            parent: this.screen,
+            width: "70%",
+            height: "70%",
+            left: "center",
+            top: "center",
+            border: {
+                type: 'line',
+            },
+            style: {
+                fg: 'white',
+                border: {
+                    fg: '#f0f0f0',
+                },
+            },
+            align: "center",
+            valign: "middle",
+        });
+
+        let helpMessage = `This is our {red-fg}styled{/red-fg} help message...
+        Multiline :D`;
+
+        this.mainView.append(messageBox);
+        messageBox.display(helpMessage, 0, function() {
             if (callback !== undefined) {
                 callback();
             }
