@@ -409,7 +409,7 @@ class Game {
 
     gameOverMessage() {
         this.tui.disableKeys();
-        clearInterval(this.monsterInterval);
+        this.stopProcessingMonsters();
         // TODO clearing main view not working here?
 
         let msg = "Game over!";
@@ -672,6 +672,10 @@ class Game {
             game.refreshScreen();
 
         }, game.parameters.monsterInterval);
+    }
+
+    stopProcessingMonsters() {
+        clearInterval(this.monsterInterval);
     }
 
     constructor() {
