@@ -1,4 +1,6 @@
-import { getRandomInt } from './util.js';
+import {
+    getRandomInt
+} from './util.js';
 
 export class Item {
     type;
@@ -7,19 +9,30 @@ export class Item {
 }
 
 let types = [{
-    name: 'Health potion',
+    name: 'Health Potion',
     symbol: "H",
     effect: function(game) {
         game.modifyPlayerHealth(getRandomInt(20, 100));
     },
 }, {
-    name: 'Agility potion',
+    name: 'Agility Potion',
     symbol: "A",
     effect: function(game) {
         game.parameters.playerSpeed = 2;
         setTimeout(function() {
             game.parameters.playerSpeed = game.defaultParameters.playerSpeed;
         }, 10 * 1000);
+    },
+}, {
+    name: 'Monster Slowdown Totem',
+    symbol: 'T',
+    effect: function(game) {
+        game.stopProcessingMonsters();
+        game.parameters.monsterInterval = 2500;
+        game.startProcessingMonsters();
+        setTimeout(function() {
+            game.parameters.monsterInterval = game.defaultParameters.monsterInterval;
+        }, 15 * 1000);
     },
 }];
 
