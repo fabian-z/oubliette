@@ -429,7 +429,7 @@ class Game {
     }
 
     welcomeMessage(callback) {
-        let msg = "You awaken in your personal nightmare!\nYou awaken in a dark dungeon and can only see a faint light from an opening at the top - the only way out is to defeat all monsters.";
+        let msg = "You awaken in your personal nightmare!\nAround you is a dark dungeon and you can only see a faint light from an opening at the top - the only way out is to defeat all monsters.";
         this.tui.popupMessage(msg, 0, callback);
     }
 
