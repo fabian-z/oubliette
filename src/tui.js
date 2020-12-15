@@ -185,41 +185,39 @@ export class TerminalInterface {
         });
 
         let helpMessage = `{underline}Game Explanation{/underline}
-          Your main goal is to survive! This includes killing all monsters in this spooky dungeon.
-          You can use all items you find (just walk over the item symbol).
-          To kill these nasty monsters you just press these keys when next to them:
-          "Alt" and "WASD" or arrow keys (the direction of the monster).
-          If you're too scared just press "ESC", "q" or "h" to awake from this creepy nightmare.
+Your main goal is to survive! This includes killing all monsters in this spooky dungeon.
+You can use all items you find (just walk over the item symbol).
+To kill these nasty monsters you just press these keys when next to them:
+"Alt" and "WASD" or arrow keys (the direction of the monster).
+If you're too scared just press "ESC", "q" or "h" to awake from this creepy nightmare.
 
-
-        {underline}Symbols{/underline}
+{underline}Symbols{/underline}
         
-                {green-fg}{bold}@{/bold}{/green-fg} = You
+{green-fg}{bold}@{/bold}{/green-fg} = You
 
-            {bold}*{/bold}Monsters:
-             Sorted list from lowest to highest base damage!        
-             {grey-fg}(Monsters can be weaker or stronger than their base damage){/grey-fg}
+{bold}*{/bold}Monsters:
+Sorted list from lowest to highest base damage!        
+{grey-fg}(Monsters can be weaker or stronger than their base damage){/grey-fg}
 
-                {red-fg}{bold}B{/bold}{/red-fg} = Bat
-                {red-fg}{bold}S{/bold}{/red-fg} = Spider
-                {red-fg}{bold}R{/bold}{/red-fg} = Rat
-                {red-fg}{bold}W{/bold}{/red-fg} = Warg
-                {red-fg}{bold}O{/bold}{/red-fg} = Orc
-                {red-fg}{bold}U{/bold}{/red-fg} = Undead
-                {red-fg}{bold}T{/bold}{/red-fg} = Troll
+{red-fg}{bold}B{/bold}{/red-fg} = Bat
+{red-fg}{bold}S{/bold}{/red-fg} = Spider
+{red-fg}{bold}R{/bold}{/red-fg} = Rat
+{red-fg}{bold}W{/bold}{/red-fg} = Warg
+{red-fg}{bold}O{/bold}{/red-fg} = Orc
+{red-fg}{bold}U{/bold}{/red-fg} = Undead
+{red-fg}{bold}T{/bold}{/red-fg} = Troll
 
-            {bold}*{/bold}Items:
-             Sorted list from highest to lowest placement probability!
+{bold}*{/bold}Items:
+Sorted list from highest to lowest placement probability!
 
-                {yellow-fg}{bold}H{/bold}{/yellow-fg} = Health Potion
-                {yellow-fg}{bold}A{/bold}{/yellow-fg} = Agility Potion                  {grey-fg}(for 10 seconds){/grey-fg}
-                {yellow-fg}{bold}T{/bold}{/yellow-fg} = Monster Slowdown Totem          {grey-fg}(for 15 seconds){/grey-fg}
+{yellow-fg}{bold}H{/bold}{/yellow-fg} = Health Potion
+{yellow-fg}{bold}A{/bold}{/yellow-fg} = Agility Potion {grey-fg}(10 s.){/grey-fg}
+{yellow-fg}{bold}T{/bold}{/yellow-fg} = Monster Slowdown Totem {grey-fg}(15 s.){/grey-fg}
          
-
-        At this point you know all important information to kill all monsters and WIN.
-        Otherwise you don't understand and {red-fg}YOU WILL DIE{/red-fg}.    
-        Now collect all your courage and go back to the dungeon, warrior!
-        - Just press any key to exit -`;
+At this point you know all important information to kill all monsters and WIN.
+Otherwise you don't understand and {red-fg}YOU WILL DIE{/red-fg}.    
+Now collect all your courage and go back to the dungeon!
+- Just press any key to exit -`;
 
         this.mainView.append(messageBox);
         messageBox.display(helpMessage, 0, function() {
