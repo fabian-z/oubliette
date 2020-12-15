@@ -113,10 +113,12 @@ class Game {
         maxMonsterPath: 999, // careful with performance!
         monsterInterval: 1000,
         monsterCount: 20,
-        itemCount: 20,
+        itemCount: 10,
         playerBaseDamage: 5,
+        maximumLevels: 15,
     }
 
+    processingEvents = true;
     processingUserInput = true;
 
     pathWorkerRunning = false;
@@ -135,7 +137,11 @@ class Game {
             throw new Error("monster array not in sync during removal");
         }
         if (this.monsters.length === 0) {
-            this.gameWonMessage();
+            if (this.level === this.parameters.maximumLevels) {
+                this.gameWonMessage();
+            } else {
+                this.startNextLevel();
+            }
         }
     }
 
@@ -366,6 +372,10 @@ class Game {
         let renderedMonsters = [];
         let renderedItems = [];
 
+        if (!this.processingEvents) {
+            return;
+        }
+
         let camera = this.getCameraPos(viewSizeAvail);
         //this.tui.debug("loop until: ", viewSizeAvail.y + camera.y, viewSizeAvail.x + camera.x);
         //this.tui.debug("max length: ", this.tiles.length, this.tiles[0].length);
@@ -451,22 +461,30 @@ class Game {
     startNextLevel() {
         this.stopProcessingMonsters();
         this.processingUserInput = false;
+        this.processingEvents = false;
         // TODO inhibit event handlers, such as screen resize here?
         // TODO show loading message
 
         this.level += 1;
+        this.tui.setLevel(this.level);
         this.dungeon = new Dungeon();
         this.player.pos = this.dungeon.playerStart.scalar(this.parameters.renderScaling).floor();
+        this.tiles = [];
+        this.monsters = [];
+        this.items = [];
 
         this.setupMap();
         this.refreshPlayerPath();
         this.setupMonsters();
         this.setupItems();
 
-        this.processingUserInput = true;
-        this.startProcessingMonsters();
-        this.refreshScreen();
-
+        let game = this;
+        this.tui.popupMessage(`You defeated all monsters and crawl deeper into the dungeon..\n(level ${this.level})`, 0, function() {
+            game.processingUserInput = true;
+            game.processingEvents = true;
+            game.startProcessingMonsters();
+            game.refreshScreen();
+        });
     }
 
     setEventHandler() {
@@ -651,7 +669,7 @@ class Game {
     setupMonsters() {
         this.monsters = [];
 
-        for (let i = 0; i <= this.parameters.monsterCount; i++) {
+        for (let i = 0; i < this.parameters.monsterCount; i++) {
             let monster = generateRandomMonster();
 
             // Cap random monster placement for worst case performance
@@ -772,6 +790,7 @@ class Game {
             game.tui.debug(name);
             game.player.name = name;
             game.tui.setPlayerName(name);
+            game.tui.setLevel(game.level);
             // welcome message triggers initial screen rendering in callback and starts the game
             game.welcomeMessage(function() {
                 game.setEventHandler();

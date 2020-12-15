@@ -10,6 +10,7 @@ export class TerminalInterface {
 
     // sidebar
     playerName;
+    level;
     healthGauge;
     eventLog;
     objectList;
@@ -29,6 +30,10 @@ export class TerminalInterface {
             name = "Anonymous";
         }
         this.playerName.content = `Player: ${name}`;
+    }
+
+    setLevel(lvl) {
+        this.level.content = `Level: ${lvl}`;
     }
 
     setHealth(percent) {
@@ -293,10 +298,18 @@ Now collect all your courage and go back to the dungeon!
 
         this.playerName = blessed.box({
             parent: this.screen,
-            width: '50%',
+            width: '80%',
             height: "10%",
             content: "Player:",
         });
+
+        this.level = blessed.box({
+            parent: this.screen,
+            top: 2,
+            widht: '80%',
+            height: '10%',
+            content: "Level:",
+        })
 
         let label = blessed.box({
             parent: this.screen,
@@ -338,6 +351,7 @@ Now collect all your courage and go back to the dungeon!
         });
 
         this.rightView.append(this.playerName);
+        this.rightView.append(this.level);
         this.rightView.append(label);
         this.rightView.append(this.healthGauge);
         this.rightView.append(this.objectList);
