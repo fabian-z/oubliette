@@ -37,7 +37,7 @@ Project work for lecture Programming I
   * Research different damage / health parameters
 * Item callbacks can effect basically all game state objects ☑
 * Help screen / signs and symbols explanation for improved UX ☑
-* Level and character progression
+* Level and character progression ☑
 * Difficulty selection
   * Hard, Medium, Easy - with different game balancing
 

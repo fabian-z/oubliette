@@ -14,6 +14,7 @@ export class TerminalInterface {
     healthGauge;
     eventLog;
     objectList;
+    helpHint;
 
     setMainContent(content) {
         this.mainView.setContent(content);
@@ -344,10 +345,32 @@ Now collect all your courage and go back to the dungeon!
 
         this.objectList = blessed.box({
             parent: this.screen,
-            top: 15,
-            width: '90%',
-            height: "10%",
+            top: "30%",
+            width: "90%",
+            height: "40%",
             content: "",
+            /*border: 'line',
+            style: {
+                border: {
+                    fg: 'white',
+                },
+            },*/
+        });
+
+        this.helpHint = blessed.box({
+            parent: this.screen,
+            bottom: 0,
+            width: "90%",
+            height: "15%",
+            align: "center",
+            valign: "bottom",
+            content: "- Press 'h' or '?' for help -",
+            /*border: 'line',
+            style: {
+                border: {
+                    fg: 'white',
+                },
+            },*/
         });
 
         this.rightView.append(this.playerName);
@@ -355,6 +378,7 @@ Now collect all your courage and go back to the dungeon!
         this.rightView.append(label);
         this.rightView.append(this.healthGauge);
         this.rightView.append(this.objectList);
+        this.rightView.append(this.helpHint);
 
         this.healthGauge.setProgress(100);
 
