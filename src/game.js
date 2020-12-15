@@ -497,7 +497,7 @@ class Game {
         // react to user input with WASD / arrow keys, move player only for now
         this.tui.onKeypress(function(ch, key) {
 
-            if (key.name === "h") {
+            if (key.name === "h" || key.full === "?") {
                 game.stopProcessingMonsters();
                 game.processingUserInput = false;
 
