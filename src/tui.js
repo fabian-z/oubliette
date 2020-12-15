@@ -1,7 +1,5 @@
 import blessed from 'blessed';
-import {
-    Vector2
-} from './util.js';
+import { Vector2 } from './util.js';
 
 export class TerminalInterface {
 
