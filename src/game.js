@@ -215,11 +215,11 @@ class Game {
             // no monster there, nothing to do
             return false;
         }
-        tile.monster.health -= this.parameters.playerBaseDamage; // TODO define damage done by player
-        if (tile.monster.health <= 0) {
-            this.removeMonster(tile.monster);
+        let monster = tile.monster;
+        monster.health -= this.parameters.playerBaseDamage; // TODO define damage done by player
+        if (monster.health <= 0) {
             tile.removeMonster();
-            // TODO if all monsters are defeated, progress to next level
+            this.removeMonster(monster);
         }
         return true;
     }
@@ -446,6 +446,27 @@ class Game {
         this.tui.popupMessage(msg, 25, function() {
             game.tui.quit();
         });
+    }
+
+    startNextLevel() {
+        this.stopProcessingMonsters();
+        this.processingUserInput = false;
+        // TODO inhibit event handlers, such as screen resize here?
+        // TODO show loading message
+
+        this.level += 1;
+        this.dungeon = new Dungeon();
+        this.player.pos = this.dungeon.playerStart.scalar(this.parameters.renderScaling).floor();
+
+        this.setupMap();
+        this.refreshPlayerPath();
+        this.setupMonsters();
+        this.setupItems();
+
+        this.processingUserInput = true;
+        this.startProcessingMonsters();
+        this.refreshScreen();
+
     }
 
     setEventHandler() {

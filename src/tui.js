@@ -179,7 +179,7 @@ export class TerminalInterface {
             alwaysScroll: true,
             scrollbar: {
                 ch: " ",
-                inverse: true
+                inverse: true,
             },
             keys: true,
         });
