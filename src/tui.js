@@ -100,7 +100,7 @@ export class TerminalInterface {
         let entryBox = blessed.box({
             parent: promptBox,
             width: "50%",
-            height: "30%",
+            height: "35%",
             left: "center",
             top: "center",
             align: "center",

@@ -438,7 +438,7 @@ class Game {
         this.stopProcessingMonsters();
         // TODO clearing main view not working here?
 
-        let msg = 'Game over!\nYou died and your corpe is eaten by monsters.\nMaybe you will come back as a monster, too.\n{grey-fg}(Next time you should try reading the help message. Just press "h".){/grey-fg}';
+        let msg = 'Game over!\nYou died and your corpse is eaten by monsters.\nMaybe you will come back as a monster, too.\n{grey-fg}(Next time you should try reading the help message. Just press "h".){/grey-fg}';
         let game = this;
         this.tui.popupMessage(msg, 15, function() {
             game.tui.quit();
