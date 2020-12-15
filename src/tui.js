@@ -175,15 +175,20 @@ export class TerminalInterface {
             },
             align: "left",
             valign: "left",
+            scrollable: true,
+            alwaysScroll: true,
+            scrollbar: {
+                ch: " ",
+                inverse: true
+            },
+            keys: true,
         });
 
-        let helpMessage = `
-
-        {underline}Game Explanation{/underline}
+        let helpMessage = `{underline}Game Explanation{/underline}
           Your main goal is to survive! This includes killing all monsters in this spooky dungeon.
           You can use all items you find (just walk over the item symbol).
-          To kill these nasty monsters you just walk to them and press these buttons:
-                "Alt" and "WASD" or arrow keys (the direction in which the monster is).
+          To kill these nasty monsters you just press these keys when next to them:
+          "Alt" and "WASD" or arrow keys (the direction of the monster).
           If you're too scared just press "ESC", "q" or "h" to awake from this creepy nightmare.
 
 
@@ -214,8 +219,7 @@ export class TerminalInterface {
         At this point you know all important information to kill all monsters and WIN.
         Otherwise you don't understand and {red-fg}YOU WILL DIE{/red-fg}.    
         Now collect all your courage and go back to the dungeon, warrior!
-        - Just press any key to exit -
-        `;
+        - Just press any key to exit -`;
 
         this.mainView.append(messageBox);
         messageBox.display(helpMessage, 0, function() {
