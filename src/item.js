@@ -1,6 +1,4 @@
-import {
-    getRandomInt
-} from './util.js';
+import { getRandomInt } from './util.js';
 
 export class Item {
     type;
