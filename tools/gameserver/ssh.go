@@ -147,7 +147,7 @@ func handleChannel(newChannel ssh.NewChannel) {
 					req.Reply(true, nil)
 				}
 			case "pty-req":
-				log.Println(req.Payload)
+				//log.Println(req.Payload)
 				termLen := req.Payload[3]
 				w, h := parseDims(req.Payload[termLen+4:])
 				SetWinsize(bashf.Fd(), w, h)
