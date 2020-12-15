@@ -320,7 +320,8 @@ class Game {
 
     /*
     getCameraPos implements a scrolling map camera position centered on the player.
-    Algorithm from http://www.roguebasin.com/index.php?title=Scrolling_map
+    Adapted algorithm idea from http://www.roguebasin.com/index.php?title=Scrolling_map
+        Original algorithm:
         Let s be the dimensions of the screen, p be the player coordinates, and c be the coordinates of the upper left of the camera: 
         If p < s / 2, then c := 0. 
         If p >= m - (s / 2), then c := m - s. 
@@ -329,25 +330,29 @@ class Game {
     getCameraPos(screen) {
         let camera = new Vector2(0, 0);
         let halfScreen = screen.scalar(0.5).floor();
-        let mapX = this.tiles[0].length;
-        let mapY = this.tiles.length;
+        let mapX = this.tiles[0].length - 1;
+        let mapY = this.tiles.length - 1;
 
-        if (this.player.pos.x < halfScreen.x) {
-            // TODO remove as performance optimization?
-            camera.x = 0;
-        } else if (this.player.pos.x >= mapX - halfScreen.x) {
+        // center player
+        camera.x = this.player.pos.x - halfScreen.x;
+        if (camera.x + screen.x > mapX) {
+            // dock camera to right
             camera.x = mapX - screen.x;
-        } else {
-            camera.x = this.player.pos.x - halfScreen.x;
+        }
+        if (camera.x < 0) {
+            // dock camera to left
+            camera.x = 0;
         }
 
-        if (this.player.pos.y < halfScreen.y) {
-            // TODO remove as performance optimization?
-            camera.y = 0;
-        } else if (this.player.pos.y >= mapY - halfScreen.y) {
+        // center player
+        camera.y = this.player.pos.y - halfScreen.y;
+        if (camera.y + screen.y > mapY) {
+            // dock camera to bottom
             camera.y = mapY - screen.y;
-        } else {
-            camera.y = this.player.pos.y - halfScreen.y;
+        }
+        if (camera.y < 0) {
+            // dock camera to top
+            camera.y = 0;
         }
 
         return camera;
@@ -362,6 +367,9 @@ class Game {
         let renderedItems = [];
 
         let camera = this.getCameraPos(viewSizeAvail);
+        //this.tui.debug("loop until: ", viewSizeAvail.y + camera.y, viewSizeAvail.x + camera.x);
+        //this.tui.debug("max length: ", this.tiles.length, this.tiles[0].length);
+
         for (y = camera.y; y < viewSizeAvail.y + camera.y; y++) {
             for (x = camera.x; x < viewSizeAvail.x + camera.x; x++) {
                 if (this.tiles.length > y && this.tiles[y].length > x) {
@@ -373,6 +381,10 @@ class Game {
                     }
 
                     curTile = this.tiles[y][x];
+
+                    //if (curTile === undefined) {
+                    //    throw new Error(`curTile is undefined! y: ${y}, x: ${x}, this.tiles[y].length: ${this.tiles[y].length}, this.tiles.length: ${this.tiles.length}`);
+                    //}
 
                     if (curTile.monster instanceof Monster && curTile.monster.active) {
                         renderedMonsters.push(curTile.monster);
