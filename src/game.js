@@ -407,7 +407,7 @@ class Game {
     }
 
     welcomeMessage(callback) {
-        let msg = "You awaken in a dark dungeon and can only see a faint light from an opening at the top - defeat all monsters to survive.";
+        let msg = "You awaken in your personal nightmare!\nYou awaken in a dark dungeon and can only see a faint light from an opening at the top - the only way out is to defeat all monsters.";
         this.tui.popupMessage(msg, 0, callback);
     }
 
@@ -416,9 +416,9 @@ class Game {
         this.stopProcessingMonsters();
         // TODO clearing main view not working here?
 
-        let msg = "Game over!";
+        let msg = 'Game over!\nYou died and your corpe is eaten by monsters.\nMaybe you will come back as a monster, too.\n{grey-fg}(Next time you should try reading the help message. Just press "h".){/grey-fg}';
         let game = this;
-        this.tui.popupMessage(msg, 3, function() {
+        this.tui.popupMessage(msg, 15, function() {
             game.tui.quit();
         });
     }
@@ -429,9 +429,9 @@ class Game {
         this.stopProcessingMonsters();
         // TODO clearing main view not working here?
 
-        let msg = "Congratulations - you defeated all monsters and can survive!";
+        let msg = "Congratulations - you defeated all monsters!\nNow you are lonely in this dark maze.\nYou should eat the meat from the dead monsters to survive and hope that somebody finds you.\nGood luck!";
         let game = this;
-        this.tui.popupMessage(msg, 3, function() {
+        this.tui.popupMessage(msg, 25, function() {
             game.tui.quit();
         });
     }
