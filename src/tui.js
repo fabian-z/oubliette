@@ -309,7 +309,7 @@ Now collect all your courage and go back to the dungeon!
             widht: '80%',
             height: '10%',
             content: "Level:",
-        })
+        });
 
         let label = blessed.box({
             parent: this.screen,
