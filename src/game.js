@@ -257,6 +257,7 @@ class Game {
                 this.pathWorkerRunning = false;
 
                 //read Dijkstra map values from pathWorker
+                // TODO make sure Dijkstra map is not out of date!!
                 for (let y = 0; y < this.tiles.length; y++) {
                     for (let x = 0; x < this.tiles[0].length; x++) {
                         this.tiles[y][x].pathPlayerValue = data[y][x];
