@@ -465,8 +465,6 @@ class Game {
         this.stopProcessingMonsters();
         this.processingUserInput = false;
         this.processingEvents = false;
-        // TODO inhibit event handlers, such as screen resize here?
-        // TODO show loading message
 
         this.level += 1;
         this.tui.setLevel(this.level);
@@ -525,8 +523,6 @@ class Game {
                 // can only attack monsters directly next to player
                 offset = 1;
             }
-
-            // TODO limit frequency!!
 
             switch (key.name) {
                 case "w":
