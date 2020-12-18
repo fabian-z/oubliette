@@ -219,6 +219,7 @@ Sorted list from highest to lowest placement probability!
 {yellow-fg}{bold}H{/bold}{/yellow-fg} = Health Potion
 {yellow-fg}{bold}A{/bold}{/yellow-fg} = Agility Potion {grey-fg}(10 s.){/grey-fg}
 {yellow-fg}{bold}T{/bold}{/yellow-fg} = Monster Slowdown Totem {grey-fg}(15 s.){/grey-fg}
+{yellow-fg}{bold}V{/bold}{/yellow-fg} = Vanishing Totem
          
 At this point you know all important information to kill all monsters and WIN.
 Otherwise you don't understand and {red-fg}YOU WILL DIE{/red-fg}.    
