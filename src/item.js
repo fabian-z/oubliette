@@ -53,7 +53,7 @@ let types = [{
         // Radius 10
         // note that map iterator has to be converted to array, since it is dynamic
         // and called for each iteration, leading to exponential selection
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 20; i++) {
             for (let currentTile of Array.from(neighbours.keys())) {
                 let neighbourCandidates = game.getNeighbourTiles(currentTile.pos);
                 for (let candidate of neighbourCandidates) {
