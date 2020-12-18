@@ -70,7 +70,7 @@ let types = [{
         }
         game.startProcessingMonsters();
     },
-    probability: 0.1,
+    probability: 5,
 }];
 
 export function getRandomType() {

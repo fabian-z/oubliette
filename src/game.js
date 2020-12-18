@@ -112,6 +112,7 @@ class Game {
         playerSpeed: 1,
         maxMonsterPath: 999, // careful with performance!
         monsterInterval: 1000,
+        playerAttackInterval: 150,
         monsterCount: 20,
         itemCount: 10,
         playerBaseDamage: 5,
@@ -120,6 +121,7 @@ class Game {
 
     processingEvents = true;
     processingUserInput = true;
+    playerAttackDebounce = false;
 
     pathWorkerRunning = false;
     pathWorkerDroppedRequest = false;
@@ -517,9 +519,14 @@ class Game {
 
             let offset = game.parameters.playerSpeed;
             if (key.meta) {
+                if (game.playerAttackDebounce) {
+                    return;
+                }
                 // can only attack monsters directly next to player
                 offset = 1;
             }
+
+            // TODO limit frequency!!
 
             switch (key.name) {
                 case "w":
@@ -543,6 +550,10 @@ class Game {
             if (key.meta) {
                 if (game.attackMonster(pos)) {
                     game.refreshScreen();
+                    game.playerAttackDebounce = true;
+                    setTimeout(function() {
+                        game.playerAttackDebounce = false;
+                    }, game.parameters.playerAttackInterval);
                 }
                 return;
             }
@@ -554,6 +565,7 @@ class Game {
                 game.tui.debug(time2 - time1);
                 return;
             }
+
 
         });
     }
