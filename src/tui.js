@@ -223,12 +223,20 @@ export class TerminalInterface {
             keys: true,
         });
 
+        let attackHelp = "";
+        if (process.platform === "darwin") {
+            attackHelp = `Fn & arrow keys or Shift & WASD for attack (or play with iTerm2).`;
+        } else {
+            attackHelp = `Shift & arrow keys or WASD (with the direction of the monster).`;
+        }
+
         let helpMessage = `{underline}Game Explanation{/underline}
 Your main goal is to survive! This includes killing all monsters in this spooky dungeon.
 You can use all items you find (just walk over the item symbol).
-To kill these nasty monsters you just press these keys when next to them:
-Shift & WASD or arrow keys (with the direction of the monster).
-Mac users can use Fn & arrow keys for attack, or play with iTerm2.
+
+To kill the monsters just press the following keys when next to them:
+${attackHelp}
+
 If you are too scared just press "ESC", "q" or "h" to awake from this creepy nightmare.
 
 {underline}Symbols{/underline}
