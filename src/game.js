@@ -438,7 +438,7 @@ class Game {
             let pos = game.player.pos.clone();
 
             let offset = game.parameters.playerSpeed;
-            if (key.meta) {
+            if (key.shift) {
                 if (game.playerAttackDebounce) {
                     return;
                 }
@@ -465,7 +465,7 @@ class Game {
                     break;
             }
 
-            if (key.meta) {
+            if (key.shift) {
                 if (game.attackMonster(pos)) {
                     game.refreshScreen();
                     game.playerAttackDebounce = true;
