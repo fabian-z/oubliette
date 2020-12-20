@@ -1,5 +1,6 @@
 import { getRandomInt } from './util.js';
 import { Monster } from './monster.js';
+import { MinLevelExperience } from './player.js';
 
 export class Item {
     type;
