@@ -250,9 +250,16 @@ Sorted list from lowest to highest base damage!
 Sorted list from highest to lowest placement probability!
 
 {yellow-fg}{bold}H{/bold}{/yellow-fg} = Health Potion
+Increase health points between 20 and 100 points 
+
 {yellow-fg}{bold}A{/bold}{/yellow-fg} = Agility Potion {grey-fg}(10 s.){/grey-fg}
+Increase player speed 
+
 {yellow-fg}{bold}T{/bold}{/yellow-fg} = Monster Slowdown Totem {grey-fg}(15 s.){/grey-fg}
+Decrease monsters speed
+
 {yellow-fg}{bold}V{/bold}{/yellow-fg} = Vanishing Totem
+Kills all monsters around the player
          
 At this point you know all important information to kill all monsters and WIN.
 Otherwise you don't understand and {red-fg}YOU WILL DIE{/red-fg}.    
@@ -429,7 +436,7 @@ Now collect all your courage and go back to the dungeon!
             height: "15%",
             align: "center",
             valign: "bottom",
-            content: "- Press 'h' or '?' for help -",
+            content: "- Press 'h' or '?' for help -\n-Press 'ESC' or 'q' to quit",
             /*border: 'line',
             style: {
                 border: {
