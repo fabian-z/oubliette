@@ -29,6 +29,7 @@ Project work for lecture Programming I
 
 # Nice to have
 
+Implemented:
 * Map exploration ☑
 * Good monster pathfinding ☑
   * Uses Dijkstra map, a simplified algorithm where all edges have identical weight
@@ -40,6 +41,9 @@ Project work for lecture Programming I
 * Level and character progression ☑
 * Different weapons / attack strengths ☑
   * Dagger, Sword (permanent) and attack potion (temporary)
+
+---
+Not yet implemented:
 
 * Difficulty selection
   * Hard, Medium, Easy - with different game balancing
