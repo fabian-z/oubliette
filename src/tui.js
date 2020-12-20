@@ -258,6 +258,12 @@ Increase player speed
 {yellow-fg}{bold}T{/bold}{/yellow-fg} = Monster Slowdown Totem {grey-fg}(15 s.){/grey-fg}
 Decrease monsters speed
 
+{yellow-fg}{bold}D{/bold}{/yellow-fg} = Double Bladed Sword
+Increase player damage
+
+{yellow-fg}{bold}C{/bold}{/yellow-fg} = Charge Potion{grey-fg}(10 s.){/grey-fg}
+Increase player attack damage
+
 {yellow-fg}{bold}V{/bold}{/yellow-fg} = Vanishing Totem
 Kills all monsters around the player
          

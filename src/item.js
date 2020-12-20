@@ -40,6 +40,24 @@ let types = [{
     },
     probability: 0.2,
 }, {
+    name: 'Double Bladed Sword',
+    symbol: "D",
+    effect: function(game) {
+        game.parameters.playerBaseDamage = 10;
+        game.defaultParameters.playerBaseDamage = game.parameters.playerBaseDamage;
+    },
+    probability: 0.2,
+},  {
+    name: 'Charge Potion',
+    symbol: "C",
+    effect: function(game) {
+        game.parameters.playerBaseDamage += 5;
+        setTimeout(function() {
+            game.parameters.playerBaseDamage = game.defaultParameters.playerBaseDamage;
+        }, 15 * 1000);
+    },
+    probability: 0.2,
+},  {
     name: 'Vanishing Totem',
     symbol: 'V',
     effect: function(game) {
