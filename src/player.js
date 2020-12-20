@@ -19,12 +19,13 @@ export class Player {
 
 // calculate level from experience
 // level = sqrt(xp)/2, round to zero
+// has to be invertible for positive natural numbers, including zero
 export function LevelFromExperience(exp) {
     return Math.floor(Math.sqrt(exp) / 2.0);
 }
 
 // calculate minimum experience required for level,
-// inverse function of levelFromExperience,
+// has to be inverse function of LevelFromExperience (not regarding rounding),
 // exp = 4*lvl^2
 export function MinLevelExperience(lvl) {
     return 4 * Math.pow(lvl, 2);

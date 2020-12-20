@@ -31,7 +31,7 @@ class Game {
         playerAttackInterval: 150,
         monsterCount: 20,
         itemCount: 10,
-        playerBaseDamage: 7,
+        playerBaseDamage: 5,
         maximumLevels: 15,
     }
 
@@ -370,7 +370,6 @@ class Game {
     }
 
     gameWonMessage() {
-        // TODO replace with level progression
         this.tui.disableKeys();
         this.stopProcessingMonsters();
         // TODO clearing main view not working here?
@@ -419,6 +418,10 @@ class Game {
         // react to user input with WASD / arrow keys, move player only for now
         this.tui.onKeypress(function(ch, key) {
 
+            if (!game.processingUserInput) {
+                return;
+            }
+
             if (key.name === "h" || key.full === "?") {
                 game.stopProcessingMonsters();
                 game.processingUserInput = false;
@@ -427,10 +430,6 @@ class Game {
                     game.processingUserInput = true;
                     game.startProcessingMonsters();
                 });
-                return;
-            }
-
-            if (!game.processingUserInput) {
                 return;
             }
 
