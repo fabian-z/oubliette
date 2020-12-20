@@ -450,12 +450,12 @@ class Game {
                     break;
                 }
                 case "home": {
-                    key.name = "right";
+                    key.name = "left";
                     key.shift = true;
                     break;
                 }
                 case "end": {
-                    key.name = "left";
+                    key.name = "right";
                     key.shift = true;
                     break;
                 }

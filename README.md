@@ -22,7 +22,7 @@ Project work for lecture Programming I
   * Procedurally generated maps / dungeons ☑
     * Research algorithms and test JS implementations ☑
   * Random distribution of monsters ☑ and items ☑
-  * Track player status (health points ☑, experience, character name ☑)
+  * Track player status (health points ☑, experience ☑, character name ☑)
 * Controlled with keyboard ☑
   * Arrow keys, WASD ☑
 * Split-screen with player and game status ☑
@@ -38,6 +38,9 @@ Project work for lecture Programming I
 * Item callbacks can effect basically all game state objects ☑
 * Help screen / signs and symbols explanation for improved UX ☑
 * Level and character progression ☑
+* Different weapons / attack strengths ☑
+  * Dagger, Sword (permanent) and attack potion (temporary)
+
 * Difficulty selection
   * Hard, Medium, Easy - with different game balancing
 
@@ -47,5 +50,5 @@ Project work for lecture Programming I
   * -> Save level map but keep permadeath?
 * Research of UX with different algorithm parameters (map generation, distribution rules)
 
-* Different weapons?
+
 * Easter egg / achievements?
