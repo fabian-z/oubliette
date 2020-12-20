@@ -227,7 +227,8 @@ export class TerminalInterface {
 Your main goal is to survive! This includes killing all monsters in this spooky dungeon.
 You can use all items you find (just walk over the item symbol).
 To kill these nasty monsters you just press these keys when next to them:
-"Alt" and "WASD" or arrow keys (the direction of the monster).
+Shift & WASD or arrow keys (with the direction of the monster).
+Mac users can use Fn & arrow keys for attack, or play with iTerm2.
 If you are too scared just press "ESC", "q" or "h" to awake from this creepy nightmare.
 
 {underline}Symbols{/underline}
