@@ -436,7 +436,7 @@ Now collect all your courage and go back to the dungeon!
             height: "15%",
             align: "center",
             valign: "bottom",
-            content: "- Press 'h' or '?' for help -\n-Press 'ESC' or 'q' to quit",
+            content: "Press \n -'h' or '?' for help\n-'ESC' or 'q' to quit",
             /*border: 'line',
             style: {
                 border: {
