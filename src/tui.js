@@ -236,7 +236,7 @@ If you are too scared just press 'ESC' or 'q' to awake from this creepy nightmar
         
 {green-fg}{bold}@{/bold}{/green-fg} = You
 
-{bold}*{/bold}Monsters:
+{bold}*{/bold} Monsters:
 Sorted list from lowest to highest base damage!        
 {grey-fg}(Monsters can be weaker or stronger than their base damage){/grey-fg}
 
@@ -248,7 +248,7 @@ Sorted list from lowest to highest base damage!
 {red-fg}{bold}U{/bold}{/red-fg} = Undead
 {red-fg}{bold}T{/bold}{/red-fg} = Troll
 
-{bold}*{/bold}Items:
+{bold}*{/bold} Items:
 Sorted list from highest to lowest placement probability!
 
 {yellow-fg}{bold}H{/bold}{/yellow-fg} = Health Potion
@@ -257,14 +257,17 @@ Increase health points between 20 and 100 points
 {yellow-fg}{bold}A{/bold}{/yellow-fg} = Agility Potion {grey-fg}(10 s.){/grey-fg}
 Increase player speed 
 
+{yellow-fg}{bold}C{/bold}{/yellow-fg} = Charge Potion {grey-fg}(10 s.){/grey-fg}
+Increase player attack damage
+
+{yellow-fg}{bold}P{/bold}{/yellow-fg} = Pugio Dagger
+Increase player damage
+
 {yellow-fg}{bold}T{/bold}{/yellow-fg} = Monster Slowdown Totem {grey-fg}(15 s.){/grey-fg}
 Decrease monsters speed
 
 {yellow-fg}{bold}D{/bold}{/yellow-fg} = Double Bladed Sword
 Increase player damage
-
-{yellow-fg}{bold}C{/bold}{/yellow-fg} = Charge Potion{grey-fg}(10 s.){/grey-fg}
-Increase player attack damage
 
 {yellow-fg}{bold}V{/bold}{/yellow-fg} = Vanishing Totem
 Kills all monsters around the player
