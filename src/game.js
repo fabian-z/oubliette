@@ -435,34 +435,31 @@ class Game {
                 return;
             }
 
-            if (process.platform === "darwin") {
-                // special case Fn - arrow keys for macOS
-                // Default Terminal does not register shift or alt
-                // together with left and right arrow keys properly
-                switch (key.name) {
-                    case "pageup": {
-                        key.name = "up";
-                        key.shift = true;
-                        break;
-                    }
-                    case "pagedown": {
-                        key.name = "down";
-                        key.shift = true;
-                        break;
-                    }
-                    case "home": {
-                        key.name = "right";
-                        key.shift = true;
-                        break;
-                    }
-                    case "end": {
-                        key.name = "left";
-                        key.shift = true;
-                        break;
-                    }
+            // special case Fn - arrow keys for macOS
+            // Default Terminal does not register shift or alt
+            // together with left and right arrow keys properly
+            switch (key.name) {
+                case "pageup": {
+                    key.name = "up";
+                    key.shift = true;
+                    break;
+                }
+                case "pagedown": {
+                    key.name = "down";
+                    key.shift = true;
+                    break;
+                }
+                case "home": {
+                    key.name = "right";
+                    key.shift = true;
+                    break;
+                }
+                case "end": {
+                    key.name = "left";
+                    key.shift = true;
+                    break;
                 }
             }
-
 
             let pos = game.player.pos.clone();
 
