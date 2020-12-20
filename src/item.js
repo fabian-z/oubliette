@@ -16,8 +16,8 @@ let types = [{
     effect: function(game) {
         game.modifyPlayerHealth(getRandomInt(20, 100));
     },
-    probability: 0.5,
-}, {
+    probability: 0.25,
+},  {
     name: 'Agility Potion',
     symbol: "A",
     effect: function(game) {
@@ -25,26 +25,6 @@ let types = [{
         setTimeout(function() {
             game.parameters.playerSpeed = game.defaultParameters.playerSpeed;
         }, 10 * 1000);
-    },
-    probability: 0.2,
-}, {
-    name: 'Monster Slowdown Totem',
-    symbol: 'T',
-    effect: function(game) {
-        game.stopProcessingMonsters();
-        game.parameters.monsterInterval = 2500;
-        game.startProcessingMonsters();
-        setTimeout(function() {
-            game.parameters.monsterInterval = game.defaultParameters.monsterInterval;
-        }, 15 * 1000);
-    },
-    probability: 0.2,
-}, {
-    name: 'Double Bladed Sword',
-    symbol: "D",
-    effect: function(game) {
-        game.parameters.playerBaseDamage = 10;
-        game.defaultParameters.playerBaseDamage = game.parameters.playerBaseDamage;
     },
     probability: 0.2,
 },  {
@@ -57,6 +37,37 @@ let types = [{
         }, 15 * 1000);
     },
     probability: 0.2,
+},  {
+    name: 'Pugio Dagger',
+    symbol: "P",
+    effect: function(game) {
+        if(game.defaultParameters.playerBaseDamage > 8) {
+            return;
+        }
+        game.parameters.playerBaseDamage = 8;
+        game.defaultParameters.playerBaseDamage = game.parameters.playerBaseDamage;
+    },
+    probability: 0.15,
+},   {
+    name: 'Monster Slowdown Totem',
+    symbol: 'T',
+    effect: function(game) {
+        game.stopProcessingMonsters();
+        game.parameters.monsterInterval = 2500;
+        game.startProcessingMonsters();
+        setTimeout(function() {
+            game.parameters.monsterInterval = game.defaultParameters.monsterInterval;
+        }, 15 * 1000);
+    },
+    probability: 0.1,
+},   {
+    name: 'Double Bladed Sword',
+    symbol: "D",
+    effect: function(game) {
+        game.parameters.playerBaseDamage = 10;
+        game.defaultParameters.playerBaseDamage = game.parameters.playerBaseDamage;
+    },
+    probability: 0.05,
 },  {
     name: 'Vanishing Totem',
     symbol: 'V',
@@ -92,7 +103,7 @@ let types = [{
         }
         game.startProcessingMonsters();
     },
-    probability: 0.1,
+    probability: 0.05,
 }];
 
 export function getRandomType() {
@@ -117,7 +128,7 @@ function initSampledRandom() {
     for (let i of types) {
         // factor should be large enough to convert smallest probability
         // to decimal, e.g. for 0.1 -> 10, 0.01 -> 100, 0.001 -> 1000
-        let probWeight = i.probability * 10;
+        let probWeight = i.probability * 100;
         for (let j = 0; j < probWeight; j++) {
             weightedTypes.push(i);
         }
