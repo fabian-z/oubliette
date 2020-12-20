@@ -29,7 +29,7 @@ class Game {
         maxMonsterPath: 999, // careful with performance!
         monsterInterval: 1000,
         playerAttackInterval: 150,
-        monsterCount: 20,
+        monsterCount: 15,
         itemCount: 10,
         playerBaseDamage: 5,
         maximumLevels: 15,
