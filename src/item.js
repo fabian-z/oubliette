@@ -64,6 +64,8 @@ let types = [{
         // Fetch and remove monsters from selected tiles
         for (let neighbour of neighbours.keys()) {
             if (neighbour.monster instanceof Monster) {
+                game.player.addExperience(neighbour.monster.xp);
+                game.tui.setExperience(game.player.experience, MinLevelExperience(game.player.level + 1));
                 game.removeMonster(neighbour.monster);
                 neighbour.removeMonster();
             }

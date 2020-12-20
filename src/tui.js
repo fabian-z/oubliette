@@ -11,7 +11,9 @@ export class TerminalInterface {
     // sidebar
     playerName;
     level;
+    depth;
     healthGauge;
+    expGauge;
     eventLog;
     objectList;
     helpHint;
@@ -35,6 +37,16 @@ export class TerminalInterface {
 
     setLevel(lvl) {
         this.level.content = `Level: ${lvl}`;
+    }
+
+    setDepth(lvl) {
+        this.depth.content = `Depth: ${lvl}`;
+    }
+
+    setExperience(exp, nextLevel) {
+        let percent = Math.round((exp / nextLevel) * 100);
+        this.expGauge.setProgress(percent);
+        this.screen.render();
     }
 
     setHealth(percent) {
@@ -307,10 +319,18 @@ Now collect all your courage and go back to the dungeon!
 
         this.level = blessed.box({
             parent: this.screen,
-            top: 2,
+            top: 1,
             widht: '80%',
             height: '10%',
             content: "Level:",
+        });
+
+        this.depth = blessed.box({
+            parent: this.screen,
+            top: 3,
+            widht: '80%',
+            height: '10%',
+            content: "Depth:",
         });
 
         let label = blessed.box({
@@ -318,7 +338,7 @@ Now collect all your courage and go back to the dungeon!
             top: 5,
             width: '50%',
             height: "10%",
-            content: "HP",
+            content: "Health / Experience",
         });
 
         this.healthGauge = blessed.progressbar({
@@ -344,18 +364,41 @@ Now collect all your courage and go back to the dungeon!
             filled: 0,
         });
 
+        this.expGauge = blessed.progressbar({
+            parent: this.screen,
+            border: 'line',
+            style: {
+                fg: 'white',
+                bg: 'default',
+                bar: {
+                    bg: 'default',
+                    fg: 'blue',
+                },
+                border: {
+                    fg: 'default',
+                    bg: 'default',
+                },
+            },
+            ch: '█',
+            width: '80%',
+            height: 3,
+            top: 9,
+            //left: 3,
+            filled: 0,
+        });
+
         this.objectList = blessed.box({
             parent: this.screen,
-            top: "30%",
+            top: 13,
             width: "90%",
             height: "40%",
             content: "",
-            /*border: 'line',
+            border: 'line',
             style: {
                 border: {
                     fg: 'white',
                 },
-            },*/
+            },
         });
 
         this.helpHint = blessed.box({
@@ -376,13 +419,14 @@ Now collect all your courage and go back to the dungeon!
 
         this.rightView.append(this.playerName);
         this.rightView.append(this.level);
+        this.rightView.append(this.depth);
         this.rightView.append(label);
         this.rightView.append(this.healthGauge);
+        this.rightView.append(this.expGauge);
         this.rightView.append(this.objectList);
         this.rightView.append(this.helpHint);
 
         this.healthGauge.setProgress(100);
-
 
         // Quit on Escape, q, or Control-C.
         this.screen.key(['escape', 'q', 'C-c'], function() {

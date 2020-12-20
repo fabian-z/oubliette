@@ -5,92 +5,8 @@ import { Monster, generateRandomMonster } from './monster.js';
 import { Worker, isMainThread } from 'worker_threads';
 import { getRandomName } from "./lang.js";
 import { Item, generateRandomItem } from './item.js';
-
-class Tile {
-    isWall;
-    isRoom;
-    isCorridor;
-    roomTag;
-    pos;
-
-    neighbours = [];
-    pathPlayerValue; //Dijkstra map value, http://www.roguebasin.com/index.php?title=The_Incredible_Power_of_Dijkstra_Maps
-
-    impassable;
-    explored;
-
-    item;
-    monster;
-
-    addMonster(monster) {
-        this.monster = monster;
-        this.impassable = true;
-    }
-
-    removeMonster() {
-        this.monster = undefined;
-        this.impassable = false;
-    }
-
-    addItem(item) {
-        this.item = item;
-    }
-
-    removeItem() {
-        this.item = undefined;
-    }
-
-    clone() {
-        // custom clone function
-        // https://stackoverflow.com/questions/57542052/deep-clone-class-instance-javascript
-        let tile = new Tile();
-        tile.isWall = this.isWall;
-        tile.isCorridor = this.isCorridor;
-        tile.isRoom = this.isRoom;
-        tile.roomTag = this.roomTag;
-
-        tile.impassable = this.impassable;
-        tile.explored = this.explored;
-        tile.item = this.item;
-        tile.monster = this.monster;
-        return tile;
-    }
-
-    renderString(tui) {
-        if (!this.explored) {
-            return " ";
-        }
-        if (this.monster instanceof Monster) {
-            return tui.preRender.monsterPrefix + this.monster.symbol + tui.preRender.monsterSuffix;
-        }
-        if (this.item instanceof Item) {
-            return tui.preRender.itemPrefix + this.item.symbol + tui.preRender.itemSuffix;
-        }
-        if (this.isWall) {
-            return tui.preRender.wall;
-        }
-
-        // empty
-        if (this.isCorridor || this.isRoom) {
-            return tui.preRender.corridor;
-        }
-
-    }
-}
-
-class Player {
-    pos;
-    health = 100;
-    experience = 0;
-    level = 1;
-    name = "";
-
-    constructor(name, pos) {
-        this.name = name;
-        this.pos = pos;
-    }
-
-}
+import { Player, MinLevelExperience } from './player.js';
+import { Tile } from './tile.js';
 
 class Game {
     tiles = []; // [y][x] 2d array
@@ -226,6 +142,9 @@ class Game {
         let monster = tile.monster;
         monster.health -= this.parameters.playerBaseDamage; // TODO define damage done by player
         if (monster.health <= 0) {
+            this.player.addExperience(monster.xp);
+            this.tui.setExperience(this.player.experience, MinLevelExperience(this.player.level + 1));
+            this.tui.setLevel(this.player.level);
             tile.removeMonster();
             this.removeMonster(monster);
         }
@@ -469,7 +388,7 @@ class Game {
         this.processingEvents = false;
 
         this.level += 1;
-        this.tui.setLevel(this.level);
+        this.tui.setDepth(this.level);
         this.dungeon = new Dungeon();
         this.player.pos = this.dungeon.playerStart.scalar(this.parameters.renderScaling).floor();
         this.tiles = [];
@@ -801,7 +720,8 @@ class Game {
             game.tui.debug(name);
             game.player.name = name;
             game.tui.setPlayerName(name);
-            game.tui.setLevel(game.level);
+            game.tui.setLevel(game.player.level);
+            game.tui.setDepth(game.level);
             // welcome message triggers initial screen rendering in callback and starts the game
             game.welcomeMessage(function() {
                 game.setEventHandler();
