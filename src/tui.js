@@ -43,8 +43,11 @@ export class TerminalInterface {
         this.depth.content = `Depth: ${lvl}`;
     }
 
-    setExperience(exp, nextLevel) {
-        let percent = Math.round((exp / nextLevel) * 100);
+    setExperience(exp, thisLevelExp, nextLevelExp) {
+        // calculate progress until next level and show percent on gauge
+        let diffLvl = nextLevelExp - thisLevelExp;
+        let diffPlayer = nextLevelExp - exp;
+        let percent = ((diffLvl - diffPlayer) / diffLvl) * 100;
         this.expGauge.setProgress(percent);
         this.screen.render();
     }

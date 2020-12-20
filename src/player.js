@@ -18,9 +18,9 @@ export class Player {
 }
 
 // calculate level from experience
-// level = sqrt(xp)/2, round to nearest value
+// level = sqrt(xp)/2, round to zero
 export function LevelFromExperience(exp) {
-    return Math.round(Math.sqrt(exp) / 2.0);
+    return Math.floor(Math.sqrt(exp) / 2.0);
 }
 
 // calculate minimum experience required for level,

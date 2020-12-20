@@ -31,7 +31,7 @@ class Game {
         playerAttackInterval: 150,
         monsterCount: 20,
         itemCount: 10,
-        playerBaseDamage: 5,
+        playerBaseDamage: 7,
         maximumLevels: 15,
     }
 
@@ -143,7 +143,7 @@ class Game {
         monster.health -= this.parameters.playerBaseDamage; // TODO define damage done by player
         if (monster.health <= 0) {
             this.player.addExperience(monster.xp);
-            this.tui.setExperience(this.player.experience, MinLevelExperience(this.player.level + 1));
+            this.tui.setExperience(this.player.experience, MinLevelExperience(this.player.level), MinLevelExperience(this.player.level + 1));
             this.tui.setLevel(this.player.level);
             tile.removeMonster();
             this.removeMonster(monster);
@@ -187,7 +187,7 @@ class Game {
                     }
                 }
 
-                this.tui.debug("Worker took:", new Date() - this.workerStartTime);
+                //this.tui.debug("Worker took:", new Date() - this.workerStartTime);
 
                 if (this.pathWorkerDroppedRequest) {
                     // execute dropped request after finishing
@@ -476,10 +476,10 @@ class Game {
             }
 
             if (game.movePlayer(pos)) {
-                let time1 = new Date();
+                //let time1 = new Date();
                 game.refreshScreen();
-                let time2 = new Date();
-                game.tui.debug(time2 - time1);
+                //let time2 = new Date();
+                //game.tui.debug(time2 - time1);
                 return;
             }
 
