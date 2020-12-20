@@ -237,7 +237,7 @@ You can use all items you find (just walk over the item symbol).
 To kill the monsters just press the following keys when next to them:
 ${attackHelp}
 
-If you are too scared just press "ESC", "q" or "h" to awake from this creepy nightmare.
+If you are too scared just press "ESC", "q" to awake from this creepy nightmare.
 
 {underline}Symbols{/underline}
         
@@ -279,7 +279,7 @@ Kills all monsters around the player
 At this point you know all important information to kill all monsters and WIN.
 Otherwise you don't understand and {red-fg}YOU WILL DIE{/red-fg}.    
 Now collect all your courage and go back to the dungeon!
-- Just press any key to exit -`;
+- Press h again to exit -`;
 
         this.mainView.append(messageBox);
         messageBox.display(helpMessage, 0, function() {
