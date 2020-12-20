@@ -359,7 +359,7 @@ class Game {
     }
 
     gameOverMessage() {
-        this.tui.processingUserInput = false;
+        this.processingUserInput = false;
         this.stopProcessingMonsters();
         // TODO clearing main view not working here?
 
