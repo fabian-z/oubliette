@@ -35,6 +35,7 @@ class Game {
         maximumLevels: 15,
     }
 
+    messageCooldown = 2 * 1000;
     processingEvents = true;
     processingUserInput = true;
     playerAttackDebounce = false;
@@ -364,7 +365,8 @@ class Game {
 
         let msg = 'Game over!\nYou died and your corpse is eaten by monsters.\nMaybe you will come back as a monster, too.\n{grey-fg}(Next time you should try reading the help message. Just press "h".){/grey-fg}';
         let game = this;
-        this.tui.popupMessage(msg, 0, function() {
+
+        this.tui.alwaysPopupMessage(msg, this.messageCooldown, function() {
             game.tui.quit();
         });
     }
@@ -400,7 +402,7 @@ class Game {
         this.setupItems();
 
         let game = this;
-        this.tui.popupMessage(`You defeated all monsters and crawl deeper into the dungeon..\n(level ${this.level})`, 0, function() {
+        this.tui.alwaysPopupMessage(`You defeated all monsters and crawl deeper into the dungeon..\n(level ${this.level})`, this.messageCooldown, function() {
             game.processingUserInput = true;
             game.processingEvents = true;
             game.startProcessingMonsters();

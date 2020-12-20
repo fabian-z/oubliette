@@ -178,6 +178,24 @@ export class TerminalInterface {
         });
     }
 
+    alwaysPopupMessage(msg, minDuration, callback) {
+        // Set cooldown period for which display of message is guaranteed
+        let cooldown = true;
+        setTimeout(function() {
+            cooldown = false;
+        }, minDuration);
+        let tui = this;
+        this.popupMessage(msg, 0, function() {
+            if (cooldown) {
+                tui.popupMessage(msg, Math.floor(minDuration / 1000), function() {
+                    callback();
+                });
+                return;
+            }
+            callback();
+        });
+    }
+
     helpMessage(callback) {
         let messageBox = blessed.message({
             parent: this.screen,
