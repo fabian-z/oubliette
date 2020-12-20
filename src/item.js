@@ -17,7 +17,7 @@ let types = [{
         game.modifyPlayerHealth(getRandomInt(20, 100));
     },
     probability: 0.25,
-},  {
+}, {
     name: 'Agility Potion',
     symbol: "A",
     effect: function(game) {
@@ -27,7 +27,7 @@ let types = [{
         }, 10 * 1000);
     },
     probability: 0.2,
-},  {
+}, {
     name: 'Charge Potion',
     symbol: "C",
     effect: function(game) {
@@ -37,18 +37,18 @@ let types = [{
         }, 15 * 1000);
     },
     probability: 0.2,
-},  {
+}, {
     name: 'Pugio Dagger',
     symbol: "P",
     effect: function(game) {
-        if(game.defaultParameters.playerBaseDamage > 8) {
+        if (game.defaultParameters.playerBaseDamage > 8) {
             return;
         }
         game.parameters.playerBaseDamage = 8;
         game.defaultParameters.playerBaseDamage = game.parameters.playerBaseDamage;
     },
     probability: 0.15,
-},   {
+}, {
     name: 'Monster Slowdown Totem',
     symbol: 'T',
     effect: function(game) {
@@ -60,7 +60,7 @@ let types = [{
         }, 15 * 1000);
     },
     probability: 0.1,
-},   {
+}, {
     name: 'Double Bladed Sword',
     symbol: "D",
     effect: function(game) {
@@ -68,7 +68,7 @@ let types = [{
         game.defaultParameters.playerBaseDamage = game.parameters.playerBaseDamage;
     },
     probability: 0.05,
-},  {
+}, {
     name: 'Vanishing Totem',
     symbol: 'V',
     effect: function(game) {
@@ -80,7 +80,7 @@ let types = [{
         for (let neighbour of directNeighbours) {
             neighbours.set(game.tiles[neighbour.y][neighbour.x], true);
         }
-        // Radius 10
+        // Radius 20
         // note that map iterator has to be converted to array, since it is dynamic
         // and called for each iteration, leading to exponential selection
         for (let i = 0; i < 20; i++) {

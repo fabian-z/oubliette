@@ -80,7 +80,6 @@ export class TerminalInterface {
     }
 
     prompt(msg, def, callback) {
-
         // native blessed prompt is buggy and cannot be properly styled
 
         let promptBox = blessed.box({
@@ -131,9 +130,6 @@ export class TerminalInterface {
             width: "90%",
             height: "70%",
             // align, position and style options do not work well with textbox and cursors
-            //style: {
-            //    bg: "#000000",
-            //},
         });
 
         entryBox.append(entry);
@@ -179,7 +175,7 @@ export class TerminalInterface {
     }
 
     alwaysPopupMessage(msg, minDuration, callback) {
-        // Set cooldown period for which display of message is guaranteed
+        // cooldown period for which display of message is guaranteed
         let cooldown = true;
         setTimeout(function() {
             cooldown = false;
@@ -296,7 +292,6 @@ Now collect all your courage and go back to the dungeon!
         this.screen = blessed.screen({
             smartCSR: true,
             warnings: true,
-            //autoPadding: true,
             debug: true,
             enableKeys: true,
             title: 'oubliette',
@@ -399,7 +394,6 @@ Now collect all your courage and go back to the dungeon!
             width: '80%',
             height: 3,
             top: 6,
-            //left: 3,
             filled: 0,
         });
 
@@ -422,7 +416,6 @@ Now collect all your courage and go back to the dungeon!
             width: '80%',
             height: 3,
             top: 9,
-            //left: 3,
             filled: 0,
         });
 
@@ -432,12 +425,6 @@ Now collect all your courage and go back to the dungeon!
             width: "90%",
             height: "40%",
             content: "",
-            border: 'line',
-            style: {
-                border: {
-                    fg: 'white',
-                },
-            },
         });
 
         this.helpHint = blessed.box({
@@ -448,12 +435,6 @@ Now collect all your courage and go back to the dungeon!
             align: "center",
             valign: "bottom",
             content: "Press \n -'h' or '?' for help\n-'ESC' or 'q' to quit",
-            /*border: 'line',
-            style: {
-                border: {
-                    fg: 'white',
-                },
-            },*/
         });
 
         this.rightView.append(this.playerName);
@@ -480,31 +461,7 @@ Now collect all your courage and go back to the dungeon!
         this.preRender.itemPrefix = blessed.parseTags("{yellow-fg}{bold}");
         this.preRender.itemSuffix = blessed.parseTags("{/bold}{/yellow-fg}");
 
-
         // Focus our element.
         this.mainView.focus();
     }
 }
-
-
-// Handler examples
-
-// If our box is clicked, change the content.
-/*mainView.on('click', function(data) {
-  mainView.setContent('{center}Some different {red-fg}content{/red-fg}.{/center}');
-  gauge.setProgress(Math.random() * 100);
-  screen.render();
-});
-
-// If box is focused, handle `enter`/`return` and give us some more content.
-rightView.key('enter', function(ch, key) {
-  rightView.setContent('{right}Even different {black-fg}content{/black-fg}.{/right}\n');
-  rightView.setLine(1, 'bar');
-  rightView.insertLine(1, 'foo');
-  screen.render();
-});
-
-var timer = setInterval(function() {
-  gauge.setProgress(Math.random() * 100);
-  screen.render();
-}, 10);*/

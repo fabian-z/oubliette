@@ -77,7 +77,7 @@ class Game {
     }
 
     movePlayer(pos) {
-        //move, set explored tiles, then regenerate Dijkstra map
+        // Move, set explored tiles, then regenerate Dijkstra map
 
         // Actual movement, rollback if obstruction exists
         let origPos = this.player.pos.clone();
@@ -187,8 +187,6 @@ class Game {
                         this.tiles[y][x].pathPlayerValue = data[y][x];
                     }
                 }
-
-                //this.tui.debug("Worker took:", new Date() - this.workerStartTime);
 
                 if (this.pathWorkerDroppedRequest) {
                     // execute dropped request after finishing
@@ -302,8 +300,6 @@ class Game {
         }
 
         let camera = this.getCameraPos(viewSizeAvail);
-        //this.tui.debug("loop until: ", viewSizeAvail.y + camera.y, viewSizeAvail.x + camera.x);
-        //this.tui.debug("max length: ", this.tiles.length, this.tiles[0].length);
 
         for (y = camera.y; y < viewSizeAvail.y + camera.y; y++) {
             for (x = camera.x; x < viewSizeAvail.x + camera.x; x++) {
@@ -316,10 +312,6 @@ class Game {
                     }
 
                     curTile = this.tiles[y][x];
-
-                    //if (curTile === undefined) {
-                    //    throw new Error(`curTile is undefined! y: ${y}, x: ${x}, this.tiles[y].length: ${this.tiles[y].length}, this.tiles.length: ${this.tiles.length}`);
-                    //}
 
                     if (curTile.monster instanceof Monster && curTile.monster.active) {
                         renderedMonsters.push(curTile.monster);
@@ -436,7 +428,7 @@ class Game {
             }
 
             // special case Fn - arrow keys for macOS
-            // Default Terminal does not register shift or alt
+            // Default macOS Terminal does not register shift or alt
             // together with left and right arrow keys properly
             switch (key.name) {
                 case "pageup": {
@@ -503,10 +495,7 @@ class Game {
             }
 
             if (game.movePlayer(pos)) {
-                //let time1 = new Date();
                 game.refreshScreen();
-                //let time2 = new Date();
-                //game.tui.debug(time2 - time1);
                 return;
             }
 
@@ -517,7 +506,7 @@ class Game {
     setupMap() {
         let initialExploreRadius = this.parameters.initalExploreFactor * this.parameters.baseExploreRadius;
 
-        //initial rendering of dungeon to map tiles
+        // initial rendering of dungeon to map tiles
         for (let y = 0; y < this.dungeon.size.y; y++) {
             let row = [];
             for (let x = 0; x < this.dungeon.size.x; x++) {
@@ -651,8 +640,6 @@ class Game {
                     continue;
                 }
 
-                // TODO check for other monsters, items
-
                 curTile.monster = monster;
                 curTile.impassable = true;
                 monster.pos = targetPos;
@@ -709,7 +696,6 @@ class Game {
                     game.tiles[monster.pos.y][monster.pos.x].monster = monster;
                     game.tiles[monster.pos.y][monster.pos.x].impassable = true;
                 }
-                // game.tiles[monster.pos.y][monster.pos.x].monster = monster;
             }
 
             if (processedMonster) {
