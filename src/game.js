@@ -730,7 +730,6 @@ class Game {
         let game = this;
 
         this.tui.prompt("What is your name?", getRandomName(), function(err, name) {
-            game.tui.debug(name);
             game.player.name = name;
             game.tui.setPlayerName(name);
             game.tui.setLevel(game.player.level);
