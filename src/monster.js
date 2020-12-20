@@ -39,7 +39,7 @@ export function generateRandomMonster() {
     monster.speed = type.speed + getRandomInt(1, 5);
     monster.damage = type.damage + getRandomInt(1, 5);
 
-    monster.xp = getRandomInt(1, 10);
+    monster.xp = getRandomInt(1, 10) + monster.speed + monster.damage;
 
     // TODO generate loot
     return monster;

@@ -238,7 +238,6 @@ class Game {
             this.tui.debug("wrong apply item call");
             return false;
         }
-        this.tui.debug("applying effect callback");
         tile.item.effectCallback(this);
         this.refreshScreen();
         this.removeItem(tile.item);
@@ -259,7 +258,10 @@ class Game {
                 this.pathWorkerRunning = false;
 
                 //read Dijkstra map values from pathWorker
-                // TODO make sure Dijkstra map is not out of date!!
+                if (!data) {
+                    // invalid request, e.g. tried to calculate for unsyc level data
+                    return;
+                }
                 for (let y = 0; y < this.tiles.length; y++) {
                     for (let x = 0; x < this.tiles[0].length; x++) {
                         this.tiles[y][x].pathPlayerValue = data[y][x];
@@ -306,7 +308,7 @@ class Game {
 
         // transfer player position for generating updated Dijkstra map
         this.workerStartTime = new Date();
-        this.pathWorker.postMessage({ pos: [this.player.pos.x, this.player.pos.y] });
+        this.pathWorker.postMessage({ level: this.level, pos: [this.player.pos.x, this.player.pos.y] });
     }
 
     getNeighbourTiles(pos) {
@@ -437,13 +439,13 @@ class Game {
     }
 
     gameOverMessage() {
-        this.tui.disableKeys();
+        this.tui.processingUserInput = false;
         this.stopProcessingMonsters();
         // TODO clearing main view not working here?
 
         let msg = 'Game over!\nYou died and your corpse is eaten by monsters.\nMaybe you will come back as a monster, too.\n{grey-fg}(Next time you should try reading the help message. Just press "h".){/grey-fg}';
         let game = this;
-        this.tui.popupMessage(msg, 15, function() {
+        this.tui.popupMessage(msg, 0, function() {
             game.tui.quit();
         });
     }
@@ -454,7 +456,7 @@ class Game {
         this.stopProcessingMonsters();
         // TODO clearing main view not working here?
 
-        let msg = "Congratulations - you defeated all monsters!\nNow you are lonely in this dark maze.\nYou should eat the meat from the dead monsters to survive and hope that somebody finds you.\nGood luck!";
+        let msg = "Congratulations - you defeated all monsters!\nNow you are lonely in this dark maze.\nYou should eat meat from the dead monsters to survive and hope that somebody finds you.\nGood luck!";
         let game = this;
         this.tui.popupMessage(msg, 25, function() {
             game.tui.quit();
@@ -640,7 +642,7 @@ class Game {
         }
 
         this.pathWorkerDataChanged = true;
-        this.pathWorkerData = JSON.stringify({ max: this.parameters.maxMonsterPath, tiles: workerTiles, floor: floorMap });
+        this.pathWorkerData = JSON.stringify({ level: this.level, max: this.parameters.maxMonsterPath, tiles: workerTiles, floor: floorMap });
     }
 
     setupItems() {

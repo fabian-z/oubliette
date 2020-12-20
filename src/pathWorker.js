@@ -25,7 +25,11 @@ if (!isMainThread) {
 
         if (Object.prototype.hasOwnProperty.call(obj, "pos")) {
             // Received player position, map calculation requested
-            playerPos = data.pos;
+            playerPos = obj.pos;
+        }
+
+        if (obj.level !== baseData.level) {
+            return false;
         }
 
         let tiles = baseData.tiles;
