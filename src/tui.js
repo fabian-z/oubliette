@@ -248,7 +248,7 @@ Sorted list from lowest to highest base damage!
 Sorted list from highest to lowest placement probability!
 
 {yellow-fg}{bold}H{/bold}{/yellow-fg} = Health Potion
-Increase health points between 20 and 100 points 
+Increase health points between 40 and 100 points 
 
 {yellow-fg}{bold}A{/bold}{/yellow-fg} = Agility Potion {grey-fg}(10 s.){/grey-fg}
 Increase player speed 

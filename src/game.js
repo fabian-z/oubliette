@@ -30,7 +30,7 @@ class Game {
         monsterInterval: 1000,
         playerAttackInterval: 150,
         monsterCount: 15,
-        itemCount: 15,
+        itemCount: 13,
         playerBaseDamage: 5,
         maximumLevels: 15,
     }

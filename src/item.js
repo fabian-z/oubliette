@@ -14,9 +14,9 @@ let types = [{
     name: 'Health Potion',
     symbol: "H",
     effect: function(game) {
-        game.modifyPlayerHealth(getRandomInt(20, 100));
+        game.modifyPlayerHealth(getRandomInt(40, 100));
     },
-    probability: 0.25,
+    probability: 0.35,
 }, {
     name: 'Agility Potion',
     symbol: "A",
@@ -26,7 +26,7 @@ let types = [{
             game.parameters.playerSpeed = game.defaultParameters.playerSpeed;
         }, 10 * 1000);
     },
-    probability: 0.2,
+    probability: 0.15,
 }, {
     name: 'Charge Potion',
     symbol: "C",
@@ -36,7 +36,7 @@ let types = [{
             game.parameters.playerBaseDamage = game.defaultParameters.playerBaseDamage;
         }, 15 * 1000);
     },
-    probability: 0.2,
+    probability: 0.15,
 }, {
     name: 'Pugio Dagger',
     symbol: "P",
